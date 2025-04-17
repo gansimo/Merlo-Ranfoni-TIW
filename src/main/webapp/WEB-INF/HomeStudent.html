@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="ISO-8859-1">
+<title>Worker's home</title>
+</head>
+<body>
+	<div align="right">
+		<a th:href="@{/Logout}">Logout</a>
+	</div>
+	<h1>Welcome to the Worker's Home Page</h1>
+	Nice to see you again
+	<span th:text="${session.user.mail}"></span>
+	<p>Please use the form below to enter worked hours</p>
+	<form th:action="@{/CreateReport}" method="POST">
+		<fieldset>
+			<legend>Choose a project:</legend>
+			<div th:each="p : ${projects}">
+				<span th:text="${'Project ' + p.name + ' - Max hours ' + p.maxhours + ' - Worked hours ' + p.workedhours}"></span>
+				<input type="radio" name="projectid" th:value="${p.id}" required/>
+			</div>
+		</fieldset>
+		Specify worked hours: <input type="text" name="workedhours" required> <br>
+		Specify date (1-31): <input type="text" name="date" required> <br>
+		<input type="hidden" name="workerid" th:value="${session.user.id}">
+		<input type="submit" name="submit" value="Submit report">
+	</form>
+
+</body>
+</html>
