@@ -14,7 +14,7 @@ public class UserDAO {
 	}
 
 	public UserBean checkCredentials(String mail, String psw) throws SQLException {
-		String query = "SELECT  id, mail, corso_laurea FROM Utente  WHERE mail = ? AND psw = ?";
+		String query = "SELECT  id, mail, corso_laurea, nome, cognome FROM Utente  WHERE mail = ? AND psw = ?";
 		try (PreparedStatement pstatement = con.prepareStatement(query);) {
 			pstatement.setString(1, mail);
 			pstatement.setString(2, psw);
@@ -27,6 +27,8 @@ public class UserDAO {
 					user.setId(result.getInt("id"));
 					user.setMail(result.getString("mail"));
 					user.setCourse(result.getString("corso_laurea"));
+					user.setName(result.getString("nome"));
+					user.setSurname(result.getString("cognome"));
 					
 					return user;
 				}

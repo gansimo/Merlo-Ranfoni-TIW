@@ -4,6 +4,8 @@ public class UserBean {
 	private int id;
 	private String mail;
 	private String course;
+	private String name;
+	private String surname;
 
 	public int getId() {
 		return id;
@@ -17,6 +19,14 @@ public class UserBean {
 		return course;
 	}
 	
+	public String getName() {
+		return name;
+	}
+	
+	public String getSurname() {
+		return surname;
+	}
+	
 	public void setId(int i) {
 		id = i;
 	}
@@ -27,6 +37,14 @@ public class UserBean {
 	
 	public void setCourse(String c) {
 		course = c;
+	}
+	
+	public void setName(String n) {
+		name = n;
+	}
+	
+	public void setSurname(String s) {
+		surname = s;
 	}
 
 }

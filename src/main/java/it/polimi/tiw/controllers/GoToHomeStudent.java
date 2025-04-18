@@ -22,6 +22,8 @@ import org.thymeleaf.templateresolver.WebApplicationTemplateResolver;
 import org.thymeleaf.web.servlet.JakartaServletWebApplication;
 
 import it.polimi.tiw.beans.UserBean;
+import it.polimi.tiw.beans.*;
+import it.polimi.tiw.daos.*;
 
 
 
@@ -74,10 +76,34 @@ public class GoToHomeStudent extends HttpServlet {
 				return;
 			}
 		}
+		System.out.println("Utente loggato ID = " + u.getId()); 
+		String corsoScelto = request.getParameter("id");
+		StudentDAO aDao = new StudentDAO(connection, u.getId());
+		List<Corso> corsi = null;
+		List<Appello> date_appello = null;
+		int corsoSceltoID = 0;
+		try {
+			corsi = aDao.findCorsi();
+			System.out.println("CORSI TROVATI = " + corsi.size());
+			if (corsoScelto == null) {
+				corsoSceltoID = aDao.findDefaultProject();
+			} else {
+				corsoSceltoID = Integer.parseInt(corsoScelto);
+			}
+			CourseDAO pDao = new CourseDAO(connection, corsoSceltoID);
+			date_appello = pDao.findAppelli();
+		} catch (SQLException e) {
+			// throw new ServletException(e);
+			response.sendError(HttpServletResponse.SC_BAD_GATEWAY, "Failure in user's project database extraction");
+		}
 		String path = "/WEB-INF/HomeStudent.html";
+
 		JakartaServletWebApplication webApplication = JakartaServletWebApplication.buildApplication(getServletContext());
         WebContext ctx = new WebContext(webApplication.buildExchange(request, response), request.getLocale());
 
+		ctx.setVariable("corsi", corsi);
+		ctx.setVariable("projectid", corsoSceltoID);
+		ctx.setVariable("appello", date_appello);
 		templateEngine.process(path, ctx, response.getWriter());
 	}
 

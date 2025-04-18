@@ -1,30 +1,73 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-<meta charset="ISO-8859-1">
-<title>Worker's home</title>
+  <meta charset="ISO-8859-1">
+  <title>Worker's home</title>
+  <style>
+    .form-wrapper {
+      display: flex;
+      gap: 4rem;
+    }
+    fieldset:disabled {
+      opacity: 0.5;
+    }
+  </style>
 </head>
-<body>
-	<div align="right">
-		<a th:href="@{/Logout}">Logout</a>
-	</div>
-	<h1>Welcome to the Worker's Home Page</h1>
-	Nice to see you again
-	<span th:text="${session.user.mail}"></span>
-	<p>Please use the form below to enter worked hours</p>
-	<form th:action="@{/CreateReport}" method="POST">
-		<fieldset>
-			<legend>Choose a project:</legend>
-			<div th:each="p : ${projects}">
-				<span th:text="${'Project ' + p.name + ' - Max hours ' + p.maxhours + ' - Worked hours ' + p.workedhours}"></span>
-				<input type="radio" name="projectid" th:value="${p.id}" required/>
-			</div>
-		</fieldset>
-		Specify worked hours: <input type="text" name="workedhours" required> <br>
-		Specify date (1-31): <input type="text" name="date" required> <br>
-		<input type="hidden" name="workerid" th:value="${session.user.id}">
-		<input type="submit" name="submit" value="Submit report">
-	</form>
 
+<body>
+  <div align="right">
+    <a th:href="@{/Logout}">Logout</a>
+  </div>
+
+  <h1>Home Page Studente</h1>
+  Felice di vederti 
+  <span th:text="${session.user.name}"></span>
+  <span th:text="${session.user.surname}"></span>
+
+  <p>Puoi usare il form qui sotto per selezionare una data d'appello:</p>
+  
+  <div th:if="${#lists.isEmpty(corsi)}">
+  	<p>Nessun corso disponibile</p>
+  </div>
+
+  <div class="form-wrapper">
+ 
+ <form>
+    <fieldset>
+	  <legend>Seleziona un corso:</legend>
+	  <label for="corsoSelect">Corso:</label>
+	  <select name="projectid" id="corsoSelect" required>
+	    <option value="" disabled selected>-- Seleziona un corso --</option>
+	     <option th:each="c : ${corsi}"
+            th:value="${c.id}"
+            th:text="${'Corso ' + c.nomeCorso + ' - Prof: ' + c.nomeProf + ' ' + c.cognomeProf}">
+    </option>
+	  </select>
+	  <button type="submit">Conferma corso</button>
+	</fieldset>
+ </form>
+
+    <div th:if="${#lists.isEmpty(appello)}">
+      -- Seleziona un corso --
+    </div>
+    <div th:if="${not #lists.isEmpty(appello)}">
+	  <form th:action="@{/GoToHomeStudent}" method="POST">
+	    <fieldset>
+	      <legend>Seleziona una data d'appello:</legend>
+	      <label for="appelloSelect">Appello:</label>
+		     <select name="appelloid" id="appelloSelect" required>
+				<option value="" disabled selected>-- Seleziona una data --</option>
+				
+			 	<option th:each="a : ${appello}"
+			          th:value="${a.data}"    
+			          th:text="${#temporals.format(a.data, 'dd/MM/yyyy')}">
+			  	</option>
+			</select>
+	      <button type="submit">Conferma appello</button>
+	    </fieldset>
+	  </form>
+	</div>
+
+  </div>
 </body>
 </html>
