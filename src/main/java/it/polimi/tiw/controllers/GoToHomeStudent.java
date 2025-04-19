@@ -77,21 +77,22 @@ public class GoToHomeStudent extends HttpServlet {
 			}
 		}
 		System.out.println("Utente loggato ID = " + u.getId()); 
-		String corsoScelto = request.getParameter("id");
-		StudentDAO aDao = new StudentDAO(connection, u.getId());
-		List<Corso> corsi = null;
-		List<Appello> date_appello = null;
-		int corsoSceltoID = 0;
+		String selectedCourse = request.getParameter("id");
+		StudentDAO sDao = new StudentDAO(connection, u.getId());
+		List<Course> courses = null;
+		List<Exam> exams = null;
+		int selectedCourseID = 0;
 		try {
-			corsi = aDao.findCorsi();
-			System.out.println("CORSI TROVATI = " + corsi.size());
-			if (corsoScelto == null) {
-				corsoSceltoID = aDao.findDefaultProject();
+			courses = sDao.findStudentCourses();
+			System.out.println("CORSI TROVATI = " + courses.size());
+			if (selectedCourse == null) {
+				selectedCourseID = sDao.findFirstCourse();
 			} else {
-				corsoSceltoID = Integer.parseInt(corsoScelto);
+				selectedCourseID = Integer.parseInt(selectedCourse);
 			}
-			CourseDAO pDao = new CourseDAO(connection, corsoSceltoID);
-			date_appello = pDao.findAppelli();
+			CourseDAO cDao = new CourseDAO(connection, selectedCourseID);
+			System.out.println(selectedCourseID);
+			exams = cDao.findExams();
 		} catch (SQLException e) {
 			// throw new ServletException(e);
 			response.sendError(HttpServletResponse.SC_BAD_GATEWAY, "Failure in user's project database extraction");
@@ -101,9 +102,9 @@ public class GoToHomeStudent extends HttpServlet {
 		JakartaServletWebApplication webApplication = JakartaServletWebApplication.buildApplication(getServletContext());
         WebContext ctx = new WebContext(webApplication.buildExchange(request, response), request.getLocale());
 
-		ctx.setVariable("corsi", corsi);
-		ctx.setVariable("projectid", corsoSceltoID);
-		ctx.setVariable("appello", date_appello);
+		ctx.setVariable("courses", courses);
+		ctx.setVariable("courseID", selectedCourseID);
+		ctx.setVariable("exams", exams);
 		templateEngine.process(path, ctx, response.getWriter());
 	}
 

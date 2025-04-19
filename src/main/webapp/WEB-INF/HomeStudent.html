@@ -21,12 +21,12 @@
 
   <h1>Home Page Studente</h1>
   Felice di vederti 
-  <span th:text="${session.user.name}"></span>
-  <span th:text="${session.user.surname}"></span>
+  <span th:text="${session.user.name}">Giaco</span>
+  <span th:text="${session.user.surname}">Merlo</span>
 
   <p>Puoi usare il form qui sotto per selezionare una data d'appello:</p>
   
-  <div th:if="${#lists.isEmpty(corsi)}">
+  <div th:if="${#lists.isEmpty(courses)}">
   	<p>Nessun corso disponibile</p>
   </div>
 
@@ -36,31 +36,31 @@
     <fieldset>
 	  <legend>Seleziona un corso:</legend>
 	  <label for="corsoSelect">Corso:</label>
-	  <select name="projectid" id="corsoSelect" required>
+	  <select name="courseID" id="corsoSelect" required>
 	    <option value="" disabled selected>-- Seleziona un corso --</option>
-	     <option th:each="c : ${corsi}"
+	     <option th:each="c : ${courses}"
             th:value="${c.id}"
-            th:text="${'Corso ' + c.nomeCorso + ' - Prof: ' + c.nomeProf + ' ' + c.cognomeProf}">
+            th:text="${'Corso ' + c.courseName + ' - Prof: ' + c.profName + ' ' + c.profSurname}">
     </option>
 	  </select>
 	  <button type="submit">Conferma corso</button>
 	</fieldset>
  </form>
 
-    <div th:if="${#lists.isEmpty(appello)}">
+    <div th:if="${#lists.isEmpty(exams)}">
       -- Seleziona un corso --
     </div>
-    <div th:if="${not #lists.isEmpty(appello)}">
+    <div th:if="${not #lists.isEmpty(exams)}">
 	  <form th:action="@{/GoToHomeStudent}" method="POST">
 	    <fieldset>
 	      <legend>Seleziona una data d'appello:</legend>
 	      <label for="appelloSelect">Appello:</label>
-		     <select name="appelloid" id="appelloSelect" required>
+		     <select name="courseID" id="appelloSelect" required>
 				<option value="" disabled selected>-- Seleziona una data --</option>
 				
-			 	<option th:each="a : ${appello}"
-			          th:value="${a.data}"    
-			          th:text="${#temporals.format(a.data, 'dd/MM/yyyy')}">
+			 	<option th:each="e : ${exams}"
+			          th:value="${e.date}"    
+			          th:text="${#temporals.format(e.data, 'dd/MM/yyyy')}">
 			  	</option>
 			</select>
 	      <button type="submit">Conferma appello</button>

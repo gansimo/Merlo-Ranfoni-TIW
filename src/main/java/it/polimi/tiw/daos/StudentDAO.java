@@ -7,19 +7,19 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-import it.polimi.tiw.beans.Corso;
+import it.polimi.tiw.beans.Course;
 
 public class StudentDAO {
     private Connection con;
-    private int id;
+    private int studentID;
 
     public StudentDAO(Connection connection, int i) {
         this.con = connection;
-        this.id = i;
+        this.studentID = i;
     }
 
-    public List<Corso> findCorsi() throws SQLException {
-        List<Corso> corsi = new ArrayList<>();
+    public List<Course> findStudentCourses() throws SQLException {
+        List<Course> courses = new ArrayList<>();
         String query = "SELECT c.id, c.nome, u.nome AS prof_nome, u.cognome AS prof_cognome " +
                        "FROM Corso AS c " +
                        "JOIN Iscrizioni_corsi AS ic ON ic.id_corso = c.id " +
@@ -28,26 +28,26 @@ public class StudentDAO {
                        "ORDER BY c.nome ASC;";
 
         try (PreparedStatement pstatement = con.prepareStatement(query)) {
-            pstatement.setInt(1, this.id);
+            pstatement.setInt(1, this.studentID);
             try (ResultSet result = pstatement.executeQuery()) {
                 while (result.next()) {
-                    Corso corso = new Corso();
-                    corso.setId(result.getInt("id"));
-                    corso.setNomeCorso(result.getString("nome"));
-                    corso.setNomeProf(result.getString("prof_nome"));
-                    corso.setCognomeProf(result.getString("prof_cognome"));
-                    corsi.add(corso);
+                    Course course = new Course();
+                    course.setId(result.getInt("id"));
+                    course.setCourseName(result.getString("nome"));
+                    course.setProfName(result.getString("prof_nome"));
+                    course.setProfSurname(result.getString("prof_cognome"));
+                    courses.add(course);
                 }
             }
         }
-        return corsi;
+        return courses;
     }
 
-    public int findDefaultProject() throws SQLException {
+    public int findFirstCourse() throws SQLException {
         String query = "SELECT id_corso FROM Iscrizioni_corsi WHERE id_studente = ? ORDER BY id_corso ASC LIMIT 1";
         int r = 0;
         try (PreparedStatement pstatement = con.prepareStatement(query)) {
-            pstatement.setInt(1, this.id);
+            pstatement.setInt(1, this.studentID);
             try (ResultSet result = pstatement.executeQuery()) {
                 if (result.next()) {
                     r = result.getInt("id_corso");

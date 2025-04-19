@@ -7,7 +7,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-import it.polimi.tiw.beans.Appello;
+import it.polimi.tiw.beans.Exam;
 
 public class CourseDAO{
 	private Connection con;
@@ -18,29 +18,29 @@ public class CourseDAO{
 		this.id = i;
 	}
 	
-	public List<Appello> findAppelli() throws SQLException {
-		List<Appello> appelli = new ArrayList<Appello>();
+	public List<Exam> findExams() throws SQLException {
+		List<Exam> exams = new ArrayList<Exam>();
 		String query = "SELECT data, id_verbale, data_verbale, ora_verbale FROM Appello WHERE id_corso = ? ORDER BY data ASC;";
 		try (PreparedStatement pstatement = con.prepareStatement(query)) {
 	        pstatement.setInt(1, this.id);
 	        
 	        try (ResultSet result = pstatement.executeQuery()) {
 	            while (result.next()) {
-	                Appello appello = new Appello();
-	                appello.setIdCorso(this.id);
-	                appello.setData(result.getDate("data").toLocalDate());
+	                Exam exam = new Exam();
+	                exam.setCourseID(this.id);
+	                exam.setDate(result.getDate("data").toLocalDate());
 	                
-	                int idVerbale = result.getInt("id_verbale");
+	                int verbID = result.getInt("id_verbale");
 	                if (!result.wasNull()) {
-	                    appello.setIdVerbale(idVerbale);
-	                    appello.setDataVerbale(result.getDate("data_verbale").toLocalDate());
-	                    appello.setOraVerbale(result.getTime("ora_verbale").toLocalTime());
+	                    exam.setVerbalID(verbID);
+	                    exam.setVerbalDate(result.getDate("data_verbale").toLocalDate());
+	                    exam.setVerbalHour(result.getTime("ora_verbale").toLocalTime());
 	                }
 	                
-	                appelli.add(appello);
+	                exams.add(exam);
 	            }
 	        }
 	    }
-		return appelli;
+		return exams;
 	}
 }
