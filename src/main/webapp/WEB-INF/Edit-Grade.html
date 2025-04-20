@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>Modifica Voto Studente</title>
+</head>
+<body>
+  <h2 th:text="'Modifica voto per ' 
+      + ${selectedStudent.name} + ' ' + ${selectedStudent.surname}">Modifica voto</h2>
+
+  <form th:action="@{/EditGrade}" method="post">
+    <p>Matricola: <span th:text="${selectedStudent.matr}"/></p>
+    <p>Email:     <span th:text="${selectedStudent.mail}"/></p>
+    <p>Corso di laurea: <span th:text="${selectedStudent.course}"/></p>
+    <p>Voto attuale:    <span th:text="${selectedStudent.grade}"/></p>
+    <p>Stato attuale:   <span th:text="${selectedStudent.state}"/></p>
+
+    <label for="newGrade">Nuovo voto:</label>
+    <select id="newGrade" name="newGrade">
+      <option value="<vuoto>">&lt;vuoto&gt;</option>
+      <option value="assente">assente</option>
+      <option value="rimandato">rimandato</option>
+      <option value="riprovato">riprovato</option>
+      <option value="18">18</option>
+	  <option value="19">19</option>
+	  <option value="20">20</option>
+	  <option value="21">21</option>
+	  <option value="22">22</option>
+	  <option value="23">23</option>
+	  <option value="24">24</option>
+	  <option value="25">25</option>
+	  <option value="26">26</option>
+	  <option value="27">27</option>
+	  <option value="28">28</option>
+	  <option value="29">29</option>
+      <option value="30">30</option>
+      <option value="30 e lode">30 e lode</option>
+    </select>
+
+    <button type="submit">Conferma</button>
+  </form>
+</body>
+</html>

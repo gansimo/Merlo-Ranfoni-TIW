@@ -7,42 +7,44 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
+
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
-import jakarta.servlet.http.HttpSession;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.WebContext;
 import org.thymeleaf.templatemode.TemplateMode;
 import org.thymeleaf.templateresolver.WebApplicationTemplateResolver;
 import org.thymeleaf.web.servlet.JakartaServletWebApplication;
 
-import it.polimi.tiw.beans.Course;
-import it.polimi.tiw.beans.Exam;
+import it.polimi.tiw.beans.RegisteredStudent;
 import it.polimi.tiw.beans.UserBean;
-import it.polimi.tiw.daos.CourseDAO;
-import it.polimi.tiw.daos.ProfessorDAO;
-
+import it.polimi.tiw.daos.StudentTableDAO;
 
 /**
- * Servlet implementation class HomeProfessor
+ * Servlet implementation class GoToAppello
  */
-@WebServlet("/GoToHomeProfessor")
-public class GoToHomeProfessor extends HttpServlet {
+@WebServlet("/GoToStudentTable")
+public class GoToStudentTable extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	private TemplateEngine templateEngine;
 	private Connection connection = null;
-
-	public GoToHomeProfessor() {
-		super();
-		// TODO Auto-generated constructor stub
-	}
        
-	public void init() throws ServletException {
+    /**
+     * @see HttpServlet#HttpServlet()
+     */
+    public GoToStudentTable() {
+        super();
+        // TODO Auto-generated constructor stub
+    }
+    
+    public void init() throws ServletException {
 		ServletContext servletContext = getServletContext();
 		JakartaServletWebApplication webApplication = JakartaServletWebApplication.buildApplication(servletContext);
 		WebApplicationTemplateResolver templateResolver = new WebApplicationTemplateResolver(webApplication);
@@ -66,10 +68,11 @@ public class GoToHomeProfessor extends HttpServlet {
 			throw new UnavailableException("Couldn't get db connection");
 		}
 	}
-	
-	protected void doGet(HttpServletRequest request, HttpServletResponse response)
-			throws ServletException, IOException {
 
+	/**
+	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
+	 */
+	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		String loginpath = getServletContext().getContextPath() + "/index.html";
 		UserBean u = null;
 		HttpSession s = request.getSession();
@@ -84,20 +87,24 @@ public class GoToHomeProfessor extends HttpServlet {
 			}
 		}
 		
-		ProfessorDAO pDAO = new ProfessorDAO(connection);
-		List<Course> courses = new ArrayList<>();
+		StudentTableDAO stDAO = new StudentTableDAO(connection);
+		List<RegisteredStudent> students = new ArrayList<>();
+		int selectedCourseID = (Integer) s.getAttribute("selectedCourseID");
+		String stringDate = request.getParameter("date");
+		s.setAttribute("selectedDate", stringDate);
+
 		try {
-			courses = pDAO.findProfessorCourses(u.getId());
+			students = stDAO.getStudentTable(selectedCourseID, stringDate);
 			System.out.println("ciao");
 		} catch (SQLException e) {
 			//throw new ServletException(e);
-			response.sendError(HttpServletResponse.SC_BAD_GATEWAY, "Failure in database finding professor courses");
+			response.sendError(HttpServletResponse.SC_BAD_GATEWAY, "Failure in database finding student table");
  		}
 
-		String path = "/WEB-INF/HomeProfessor.html";
+		String path = "/WEB-INF/StudentTable.html";
 		JakartaServletWebApplication webApplication = JakartaServletWebApplication.buildApplication(getServletContext());
         WebContext ctx = new WebContext(webApplication.buildExchange(request, response), request.getLocale());
-        ctx.setVariable("availableCourses", courses);
+        ctx.setVariable("studentTable", students);
 
 		templateEngine.process(path, ctx, response.getWriter());
 	}
@@ -107,50 +114,7 @@ public class GoToHomeProfessor extends HttpServlet {
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// TODO Auto-generated method stub
-		String loginpath = getServletContext().getContextPath() + "/index.html";
-		UserBean u = null;
-		HttpSession s = request.getSession();
-		if (s.isNew() || s.getAttribute("user") == null) {
-			response.sendRedirect(loginpath);
-			return;
-		} else {
-			u = (UserBean) s.getAttribute("user");
-			if (!u.getCourse().equals("Docente")) {
-				response.sendRedirect(loginpath);
-				return;
-			}
-		}
-		int selectedCourseID = Integer.parseInt(request.getParameter("scelta"));
-		request.getSession().setAttribute("selectedCourseID", selectedCourseID);
-		CourseDAO cDAO = new CourseDAO(connection, selectedCourseID);
-		List<Exam> exams = new ArrayList<>();
-		
-		try {
-			exams = cDAO.findExams();
-			System.out.println("ciao");
-		} catch (SQLException e) {
-			//throw new ServletException(e);
-			response.sendError(HttpServletResponse.SC_BAD_GATEWAY, "Failure in database finding professor courses");
- 		}
-		
-		ProfessorDAO pDAO = new ProfessorDAO(connection);
-		List<Course> courses = new ArrayList<>();
-		try {
-			courses = pDAO.findProfessorCourses(u.getId());
-			System.out.println("ciao");
-		} catch (SQLException e) {
-			//throw new ServletException(e);
-			response.sendError(HttpServletResponse.SC_BAD_GATEWAY, "Failure in database finding professor courses");
- 		}
-		
-		String path = "/WEB-INF/HomeProfessor.html";
-		JakartaServletWebApplication webApplication = JakartaServletWebApplication.buildApplication(getServletContext());
-        WebContext ctx = new WebContext(webApplication.buildExchange(request, response), request.getLocale());
-        ctx.setVariable("availableDates", exams);
-        ctx.setVariable("availableCourses", courses);
-
-		templateEngine.process(path, ctx, response.getWriter());
-		
+		doGet(request, response);
 	}
 
 }

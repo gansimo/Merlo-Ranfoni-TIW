@@ -7,42 +7,44 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
+
 import java.io.IOException;
+import java.net.URLEncoder;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-import jakarta.servlet.http.HttpSession;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.WebContext;
 import org.thymeleaf.templatemode.TemplateMode;
 import org.thymeleaf.templateresolver.WebApplicationTemplateResolver;
 import org.thymeleaf.web.servlet.JakartaServletWebApplication;
 
-import it.polimi.tiw.beans.Course;
-import it.polimi.tiw.beans.Exam;
+import it.polimi.tiw.beans.RegisteredStudent;
 import it.polimi.tiw.beans.UserBean;
-import it.polimi.tiw.daos.CourseDAO;
-import it.polimi.tiw.daos.ProfessorDAO;
-
+import it.polimi.tiw.daos.StudentTableDAO;
 
 /**
- * Servlet implementation class HomeProfessor
+ * Servlet implementation class EditGrade
  */
-@WebServlet("/GoToHomeProfessor")
-public class GoToHomeProfessor extends HttpServlet {
+@WebServlet("/EditGrade")
+public class EditGrade extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	private TemplateEngine templateEngine;
 	private Connection connection = null;
-
-	public GoToHomeProfessor() {
-		super();
-		// TODO Auto-generated constructor stub
-	}
        
-	public void init() throws ServletException {
+    /**
+     * @see HttpServlet#HttpServlet()
+     */
+    public EditGrade() {
+        super();
+        // TODO Auto-generated constructor stub
+    }
+    
+    public void init() throws ServletException {
 		ServletContext servletContext = getServletContext();
 		JakartaServletWebApplication webApplication = JakartaServletWebApplication.buildApplication(servletContext);
 		WebApplicationTemplateResolver templateResolver = new WebApplicationTemplateResolver(webApplication);
@@ -66,10 +68,12 @@ public class GoToHomeProfessor extends HttpServlet {
 			throw new UnavailableException("Couldn't get db connection");
 		}
 	}
-	
-	protected void doGet(HttpServletRequest request, HttpServletResponse response)
-			throws ServletException, IOException {
+    
 
+	/**
+	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
+	 */
+	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		String loginpath = getServletContext().getContextPath() + "/index.html";
 		UserBean u = null;
 		HttpSession s = request.getSession();
@@ -84,20 +88,28 @@ public class GoToHomeProfessor extends HttpServlet {
 			}
 		}
 		
-		ProfessorDAO pDAO = new ProfessorDAO(connection);
-		List<Course> courses = new ArrayList<>();
+		StudentTableDAO stDAO = new StudentTableDAO(connection);
+		RegisteredStudent stud = new RegisteredStudent();
+		int selectedCourseID = (Integer) s.getAttribute("selectedCourseID");
+		String studentID = request.getParameter("selectedStudID");
+		int selectedStudentID = Integer.parseInt(studentID);
+		s.setAttribute("selectedStudID", selectedStudentID);
+		String stringDate = (String) s.getAttribute("selectedDate");
+		
+		System.out.println(selectedCourseID + " " + selectedStudentID + " " + stringDate);
+
 		try {
-			courses = pDAO.findProfessorCourses(u.getId());
+			stud = stDAO.getRegisteredStudent(selectedCourseID, stringDate, selectedStudentID);
 			System.out.println("ciao");
 		} catch (SQLException e) {
 			//throw new ServletException(e);
-			response.sendError(HttpServletResponse.SC_BAD_GATEWAY, "Failure in database finding professor courses");
+			response.sendError(HttpServletResponse.SC_BAD_GATEWAY, "Failure in database finding student");
  		}
 
-		String path = "/WEB-INF/HomeProfessor.html";
+		String path = "/WEB-INF/Edit-Grade.html";
 		JakartaServletWebApplication webApplication = JakartaServletWebApplication.buildApplication(getServletContext());
         WebContext ctx = new WebContext(webApplication.buildExchange(request, response), request.getLocale());
-        ctx.setVariable("availableCourses", courses);
+        ctx.setVariable("selectedStudent", stud);
 
 		templateEngine.process(path, ctx, response.getWriter());
 	}
@@ -106,7 +118,6 @@ public class GoToHomeProfessor extends HttpServlet {
 	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		// TODO Auto-generated method stub
 		String loginpath = getServletContext().getContextPath() + "/index.html";
 		UserBean u = null;
 		HttpSession s = request.getSession();
@@ -120,37 +131,22 @@ public class GoToHomeProfessor extends HttpServlet {
 				return;
 			}
 		}
-		int selectedCourseID = Integer.parseInt(request.getParameter("scelta"));
-		request.getSession().setAttribute("selectedCourseID", selectedCourseID);
-		CourseDAO cDAO = new CourseDAO(connection, selectedCourseID);
-		List<Exam> exams = new ArrayList<>();
+		
+		StudentTableDAO stDAO = new StudentTableDAO(connection);
+		int selectedCourseID = (Integer) s.getAttribute("selectedCourseID");
+		String stringDate = (String) s.getAttribute("selectedDate");
+		int selectedStudID = (Integer) s.getAttribute("selectedStudID");
+		String grade = request.getParameter("newGrade");
 		
 		try {
-			exams = cDAO.findExams();
-			System.out.println("ciao");
+			stDAO.updateGrade(selectedCourseID, stringDate, selectedStudID, grade, "inserito");
 		} catch (SQLException e) {
-			//throw new ServletException(e);
-			response.sendError(HttpServletResponse.SC_BAD_GATEWAY, "Failure in database finding professor courses");
- 		}
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		
-		ProfessorDAO pDAO = new ProfessorDAO(connection);
-		List<Course> courses = new ArrayList<>();
-		try {
-			courses = pDAO.findProfessorCourses(u.getId());
-			System.out.println("ciao");
-		} catch (SQLException e) {
-			//throw new ServletException(e);
-			response.sendError(HttpServletResponse.SC_BAD_GATEWAY, "Failure in database finding professor courses");
- 		}
 		
-		String path = "/WEB-INF/HomeProfessor.html";
-		JakartaServletWebApplication webApplication = JakartaServletWebApplication.buildApplication(getServletContext());
-        WebContext ctx = new WebContext(webApplication.buildExchange(request, response), request.getLocale());
-        ctx.setVariable("availableDates", exams);
-        ctx.setVariable("availableCourses", courses);
-
-		templateEngine.process(path, ctx, response.getWriter());
-		
+		response.sendRedirect(request.getContextPath() + "/GoToStudentTable?date=" + URLEncoder.encode(stringDate, "UTF-8"));
 	}
 
 }
