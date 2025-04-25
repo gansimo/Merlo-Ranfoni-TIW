@@ -21,16 +21,19 @@
 </head>
 <body>
   <h2>Elenco Studenti Iscritti</h2>
+  <div align="right">
+		<a th:href="@{/Logout}">Logout</a>
+  </div>
   <table>
     <thead>
       <tr>
-        <th>Matricola</th>
-        <th>Cognome</th>
-        <th>Nome</th>
-        <th>Email</th>
-        <th>Corso di laurea</th>
-        <th>Voto</th>
-        <th>Stato valutazione</th>
+        <th> <a th:href="@{/OrderStudentTable(column='u.matricola')}">Matricola</a></th>
+        <th> <a th:href="@{/OrderStudentTable(column='u.cognome')}">Cognome</a></th>
+        <th> <a th:href="@{/OrderStudentTable(column='u.nome')}">Nome</a></th>
+        <th> <a th:href="@{/OrderStudentTable(column='u.mail')}">Email</a></th>
+        <th> <a th:href="@{/OrderStudentTable(column='u.corso_laurea')}">Corso di laurea</a></th>
+        <th> <a th:href="@{/OrderStudentTable(column='i.voto')}">Voto</a></th>
+        <th> <a th:href="@{/OrderStudentTable(column='i.stato')}">Stato valutazione</a></th>
       </tr>
     </thead>
     <tbody th:remove="all-but-first">
@@ -80,6 +83,18 @@
       </tr>
     </tbody>
   </table>
+  
+  <div align="left">
+		<a th:href="@{/PublishGrades}">Pubblica i voti inseriti</a>
+  </div>
+  
+  <div align="left">
+		<a th:href="@{/VerbalizeGrades}">Verbalizza i voti pubblicati</a>
+  </div>
+  
+  <div align="right">
+		<a th:href="@{/GoToHomeProfessor}">Torna alla Home</a>
+  </div>
 
 </body>
 </html>

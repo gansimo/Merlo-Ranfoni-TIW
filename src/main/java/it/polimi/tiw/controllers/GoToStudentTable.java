@@ -92,6 +92,8 @@ public class GoToStudentTable extends HttpServlet {
 		int selectedCourseID = (Integer) s.getAttribute("selectedCourseID");
 		String stringDate = request.getParameter("date");
 		s.setAttribute("selectedDate", stringDate);
+		s.setAttribute("lastOrderCol", null);
+        s.setAttribute("lastOrderDir", null);
 
 		try {
 			students = stDAO.getStudentTable(selectedCourseID, stringDate);

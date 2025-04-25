@@ -14,24 +14,20 @@ import java.net.URLEncoder;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
 
 import org.thymeleaf.TemplateEngine;
-import org.thymeleaf.context.WebContext;
 import org.thymeleaf.templatemode.TemplateMode;
 import org.thymeleaf.templateresolver.WebApplicationTemplateResolver;
 import org.thymeleaf.web.servlet.JakartaServletWebApplication;
 
-import it.polimi.tiw.beans.RegisteredStudent;
 import it.polimi.tiw.beans.UserBean;
 import it.polimi.tiw.daos.StudentTableDAO;
 
 /**
- * Servlet implementation class EditGrade
+ * Servlet implementation class PublishGrades
  */
-@WebServlet("/EditGrade")
-public class EditGrade extends HttpServlet {
+@WebServlet("/PublishGrades")
+public class PublishGrades extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	private TemplateEngine templateEngine;
 	private Connection connection = null;
@@ -39,7 +35,7 @@ public class EditGrade extends HttpServlet {
     /**
      * @see HttpServlet#HttpServlet()
      */
-    public EditGrade() {
+    public PublishGrades() {
         super();
         // TODO Auto-generated constructor stub
     }
@@ -68,7 +64,6 @@ public class EditGrade extends HttpServlet {
 			throw new UnavailableException("Couldn't get db connection");
 		}
 	}
-    
 
 	/**
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
@@ -89,65 +84,26 @@ public class EditGrade extends HttpServlet {
 		}
 		
 		StudentTableDAO stDAO = new StudentTableDAO(connection);
-		RegisteredStudent stud = new RegisteredStudent();
 		int selectedCourseID = (Integer) s.getAttribute("selectedCourseID");
-		String studentID = request.getParameter("selectedStudID");
-		int selectedStudentID = Integer.parseInt(studentID);
-		s.setAttribute("selectedStudID", selectedStudentID);
-		String stringDate = (String) s.getAttribute("selectedDate");
+		String selectedDate = (String) s.getAttribute("selectedDate");
 		
-		System.out.println(selectedCourseID + " " + selectedStudentID + " " + stringDate);
-
 		try {
-			stud = stDAO.getRegisteredStudent(selectedCourseID, stringDate, selectedStudentID);
+			stDAO.publishGrades(selectedCourseID, selectedDate);
 			System.out.println("ciao");
 		} catch (SQLException e) {
 			//throw new ServletException(e);
-			response.sendError(HttpServletResponse.SC_BAD_GATEWAY, "Failure in database finding student");
+			response.sendError(HttpServletResponse.SC_BAD_GATEWAY, "Failure in database publishing grades");
  		}
-
-		String path = "/WEB-INF/Edit-Grade.html";
-		JakartaServletWebApplication webApplication = JakartaServletWebApplication.buildApplication(getServletContext());
-        WebContext ctx = new WebContext(webApplication.buildExchange(request, response), request.getLocale());
-        ctx.setVariable("selectedStudent", stud);
-        ctx.setVariable("examDate", stringDate);
-
-		templateEngine.process(path, ctx, response.getWriter());
+		
+		response.sendRedirect(request.getContextPath() + "/GoToStudentTable?date=" + URLEncoder.encode(selectedDate, "UTF-8"));
 	}
 
 	/**
 	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		String loginpath = getServletContext().getContextPath() + "/index.html";
-		UserBean u = null;
-		HttpSession s = request.getSession();
-		if (s.isNew() || s.getAttribute("user") == null) {
-			response.sendRedirect(loginpath);
-			return;
-		} else {
-			u = (UserBean) s.getAttribute("user");
-			if (!u.getCourse().equals("Docente")) {
-				response.sendRedirect(loginpath);
-				return;
-			}
-		}
-		
-		StudentTableDAO stDAO = new StudentTableDAO(connection);
-		int selectedCourseID = (Integer) s.getAttribute("selectedCourseID");
-		String stringDate = (String) s.getAttribute("selectedDate");
-		int selectedStudID = (Integer) s.getAttribute("selectedStudID");
-		String grade = request.getParameter("newGrade");
-		
-		try {
-			stDAO.updateGrade(selectedCourseID, stringDate, selectedStudID, grade, "inserito");
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
-		
-		response.sendRedirect(request.getContextPath() + "/GoToStudentTable?date=" + URLEncoder.encode(stringDate, "UTF-8"));
+		// TODO Auto-generated method stub
+		doGet(request, response);
 	}
 
 }

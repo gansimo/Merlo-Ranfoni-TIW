@@ -10,7 +10,6 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
 import java.io.IOException;
-import java.net.URLEncoder;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -28,10 +27,10 @@ import it.polimi.tiw.beans.UserBean;
 import it.polimi.tiw.daos.StudentTableDAO;
 
 /**
- * Servlet implementation class EditGrade
+ * Servlet implementation class OrderStudentTable
  */
-@WebServlet("/EditGrade")
-public class EditGrade extends HttpServlet {
+@WebServlet("/OrderStudentTable")
+public class OrderStudentTable extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	private TemplateEngine templateEngine;
 	private Connection connection = null;
@@ -39,7 +38,7 @@ public class EditGrade extends HttpServlet {
     /**
      * @see HttpServlet#HttpServlet()
      */
-    public EditGrade() {
+    public OrderStudentTable() {
         super();
         // TODO Auto-generated constructor stub
     }
@@ -68,7 +67,6 @@ public class EditGrade extends HttpServlet {
 			throw new UnavailableException("Couldn't get db connection");
 		}
 	}
-    
 
 	/**
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
@@ -89,28 +87,31 @@ public class EditGrade extends HttpServlet {
 		}
 		
 		StudentTableDAO stDAO = new StudentTableDAO(connection);
-		RegisteredStudent stud = new RegisteredStudent();
+		List<RegisteredStudent> students = new ArrayList<>();
 		int selectedCourseID = (Integer) s.getAttribute("selectedCourseID");
-		String studentID = request.getParameter("selectedStudID");
-		int selectedStudentID = Integer.parseInt(studentID);
-		s.setAttribute("selectedStudID", selectedStudentID);
-		String stringDate = (String) s.getAttribute("selectedDate");
+		String selectedDate = (String) s.getAttribute("selectedDate");
+		String orderByColumn = request.getParameter("column");
 		
-		System.out.println(selectedCourseID + " " + selectedStudentID + " " + stringDate);
+		String lastCol = (String) s.getAttribute("lastOrderCol");
+	    String lastDir = (String) s.getAttribute("lastOrderDir");
+	    
+	    String orderByDirection = ("ASC".equals(lastDir) && orderByColumn.equals(lastCol)) ? "DESC" : "ASC";
 
 		try {
-			stud = stDAO.getRegisteredStudent(selectedCourseID, stringDate, selectedStudentID);
+			students = stDAO.getOrderedStudentTable(selectedCourseID, selectedDate, orderByColumn, orderByDirection);
 			System.out.println("ciao");
 		} catch (SQLException e) {
 			//throw new ServletException(e);
-			response.sendError(HttpServletResponse.SC_BAD_GATEWAY, "Failure in database finding student");
+			response.sendError(HttpServletResponse.SC_BAD_GATEWAY, "Failure in database to order student table");
  		}
 
-		String path = "/WEB-INF/Edit-Grade.html";
+		String path = "/WEB-INF/StudentTable.html";
 		JakartaServletWebApplication webApplication = JakartaServletWebApplication.buildApplication(getServletContext());
         WebContext ctx = new WebContext(webApplication.buildExchange(request, response), request.getLocale());
-        ctx.setVariable("selectedStudent", stud);
-        ctx.setVariable("examDate", stringDate);
+        ctx.setVariable("studentTable", students);
+        
+        s.setAttribute("lastOrderCol", orderByColumn);
+        s.setAttribute("lastOrderDir", orderByDirection);
 
 		templateEngine.process(path, ctx, response.getWriter());
 	}
@@ -119,35 +120,8 @@ public class EditGrade extends HttpServlet {
 	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		String loginpath = getServletContext().getContextPath() + "/index.html";
-		UserBean u = null;
-		HttpSession s = request.getSession();
-		if (s.isNew() || s.getAttribute("user") == null) {
-			response.sendRedirect(loginpath);
-			return;
-		} else {
-			u = (UserBean) s.getAttribute("user");
-			if (!u.getCourse().equals("Docente")) {
-				response.sendRedirect(loginpath);
-				return;
-			}
-		}
-		
-		StudentTableDAO stDAO = new StudentTableDAO(connection);
-		int selectedCourseID = (Integer) s.getAttribute("selectedCourseID");
-		String stringDate = (String) s.getAttribute("selectedDate");
-		int selectedStudID = (Integer) s.getAttribute("selectedStudID");
-		String grade = request.getParameter("newGrade");
-		
-		try {
-			stDAO.updateGrade(selectedCourseID, stringDate, selectedStudID, grade, "inserito");
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
-		
-		response.sendRedirect(request.getContextPath() + "/GoToStudentTable?date=" + URLEncoder.encode(stringDate, "UTF-8"));
+		// TODO Auto-generated method stub
+		doGet(request, response);
 	}
 
 }
