@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="ISO-8859-1">
+  <title>Gestione Esame</title>
+</head>
+
+ <!--Blocco di logout-->
+  <style>
+  .btn {
+  	position: absolute;
+  	left: 0;
+  	bottom: 0;
+    display: inline-block;
+    padding: 0.5em 1em;
+    background-color: #007bff;
+    color: white;
+    text-decoration: none;
+    border-radius: 4px;
+    font-weight: bold;
+    border: none;
+  }
+
+  .btn:hover {
+    background-color: #0056b3;
+  }
+</style>
+
+ <!--Blocco di rifiuto voto-->
+  <style>
+  .btn2 {
+  	position: absolute;
+    display: inline-block;
+    padding: 0.5em 1em;
+    background-color: #808080;
+    color: white;
+    text-decoration: none;
+    border-radius: 4px;
+    font-weight: bold;
+    border: none;
+  }
+
+  .btn2:hover {
+    background-color: #c0c0c0;
+  }
+</style>
+
+
+<body>
+
+<h1>Gestione Esame</h1>
+<h3>Appello: </h3>
+<span th:text="${nome_corso}">Cucica di Torte</span>
+<span th:text="${esame.date}">25/12/800</span>
+<hr>
+<div th:if="${esame == null}">
+Impossibile caricare informazioni Appello
+<a th:href="@{/Logout}" class="btn">Logout</a>
+<hr>
+</div>
+
+<div th:if="${esame != null}">
+
+<div th:if="${esame.state == 'non inserito' or esame.state == 'inserito'}">
+	<h3>Voto non ancora definito.</h3>
+	<a th:href="@{/Logout}" class="btn">Logout</a>
+</div>
+
+<div th:if="${esame.state == 'pubblicato' or esame.state == 'rifiutato' or esame.state == 'verbalizzato'}">
+<h3>Voto: <span th:text="${esame.mark}">7 ;(</span></h3>
+<h3>Stato: <span th:text="${esame.state}">Non disturbare</span></h3>
+<hr>
+
+<div th:if="${esame.state == 'pubblicato'}">
+<a th:href="@{/Logout}" class="btn2">Rifiuta Voto</a>
+<a th:href="@{/Logout}" class="btn">Logout</a>
+
+</div>
+</div>
+
+</div> 
+</body>
+</html>

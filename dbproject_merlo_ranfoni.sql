@@ -1,4 +1,4 @@
-CREATE DATABASE IF NOT EXISTS `dbtest`
+CREATE DATABASE IF NOT EXISTS `DBProject_Merlo_Ranfoni`
     /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE=utf8mb4_0900_ai_ci */
     /*!80016 DEFAULT ENCRYPTION='N' */;
 
@@ -138,6 +138,83 @@ VALUES
 (1, '2024-06-15', 2),
 (1, '2024-06-15', 3);
 
+-- 1) Inserisco Mario Rossi
+INSERT INTO Utente (mail, psw, nome, cognome, matricola, corso_laurea)
+VALUES 
+  ('mario.rossi@uni.it', 'pswStud3', 'Mario', 'Rossi', 'S789012', 'Informatica');
+
+-- 2) Creo 4 nuovi corsi (id_prof = 1)
+INSERT INTO Corso (nome, anno, id_prof) VALUES
+  ('Algoritmi',          2024, 1),  -- id = 2
+  ('Reti di Calcolatori',2024, 1),  -- id = 3
+  ('SO - Sistemi Operativi',2024,1),-- id = 4
+  ('Calcolo Numerico',    2024, 1);  -- id = 5
+
+-- 3) Inserisco 4 appelli per ciascun corso
+--    (id_verbale univoco, data_verbale 5 giorni dopo, ora alle 09:00)
+
+-- Corso 2: Algoritmi
+INSERT INTO Appello (id_corso, data,     id_verbale, data_verbale,   ora_verbale) VALUES
+  (2, '2024-07-01', 2001, '2024-07-06', '2024-07-06 09:00:00'),
+  (2, '2024-09-10', 2002, '2024-09-15', '2024-09-15 09:00:00'),
+  (2, '2024-11-20', 2003, '2024-11-25', '2024-11-25 09:00:00'),
+  (2, '2025-01-15', 2004, '2025-01-20', '2025-01-20 09:00:00');
+
+-- Corso 3: Reti di Calcolatori
+INSERT INTO Appello (id_corso, data,     id_verbale, data_verbale,   ora_verbale) VALUES
+  (3, '2024-07-05', 3001, '2024-07-10', '2024-07-10 09:00:00'),
+  (3, '2024-09-12', 3002, '2024-09-17', '2024-09-17 09:00:00'),
+  (3, '2024-11-22', 3003, '2024-11-27', '2024-11-27 09:00:00'),
+  (3, '2025-01-18', 3004, '2025-01-23', '2025-01-23 09:00:00');
+
+-- Corso 4: Sistemi Operativi
+INSERT INTO Appello (id_corso, data,     id_verbale, data_verbale,   ora_verbale) VALUES
+  (4, '2024-07-08', 4001, '2024-07-13', '2024-07-13 09:00:00'),
+  (4, '2024-09-15', 4002, '2024-09-20', '2024-09-20 09:00:00'),
+  (4, '2024-11-25', 4003, '2024-11-30', '2024-11-30 09:00:00'),
+  (4, '2025-01-20', 4004, '2025-01-25', '2025-01-25 09:00:00');
+
+-- Corso 5: Calcolo Numerico
+INSERT INTO Appello (id_corso, data,     id_verbale, data_verbale,   ora_verbale) VALUES
+  (5, '2024-07-10', 5001, '2024-07-15', '2024-07-15 09:00:00'),
+  (5, '2024-09-18', 5002, '2024-09-23', '2024-09-23 09:00:00'),
+  (5, '2024-11-28', 5003, '2024-12-03', '2024-12-03 09:00:00'),
+  (5, '2025-01-22', 5004, '2025-01-27', '2025-01-27 09:00:00');
+
+-- 4) Iscrivo Mario Rossi (id_studente = 4) ai 4 corsi
+INSERT INTO Iscrizioni_Corsi (id_corso, id_studente) VALUES
+  (2, 4),
+  (3, 4),
+  (4, 4),
+  (5, 4);
+
+-- 5) Iscrivo Mario Rossi a tutti gli appelli di ciascun corso
+INSERT INTO Iscrizioni_Appello (id_corso, data,     id_studente) VALUES
+  -- Algoritmi (corso 2)
+  (2, '2024-07-01', 4),
+  (2, '2024-09-10', 4),
+  (2, '2024-11-20', 4),
+  (2, '2025-01-15', 4),
+
+  -- Reti di Calcolatori (corso 3)
+  (3, '2024-07-05', 4),
+  (3, '2024-09-12', 4),
+  (3, '2024-11-22', 4),
+  (3, '2025-01-18', 4),
+
+  -- Sistemi Operativi (corso 4)
+  (4, '2024-07-08', 4),
+  (4, '2024-09-15', 4),
+  (4, '2024-11-25', 4),
+  (4, '2025-01-20', 4),
+
+  -- Calcolo Numerico (corso 5)
+  (5, '2024-07-10', 4),
+  (5, '2024-09-18', 4),
+  (5, '2024-11-28', 4),
+  (5, '2025-01-22', 4);
+  
+  
 -- SELECT * FROM Utente;
 -- SELECT * FROM Corso;
 -- SELECT * FROM Appello;

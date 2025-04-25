@@ -2,72 +2,102 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
   <meta charset="ISO-8859-1">
-  <title>Worker's home</title>
+  <title>Student's home</title>
+  
+  <!--Blocco di logout-->
   <style>
-    .form-wrapper {
-      display: flex;
-      gap: 4rem;
-    }
-    fieldset:disabled {
-      opacity: 0.5;
-    }
-  </style>
+  .btn {
+  	position: absolute;
+  	left: 0;
+  	bottom: 0;
+    display: inline-block;
+    padding: 0.5em 1em;
+    background-color: #007bff;
+    color: white;
+    text-decoration: none;
+    border-radius: 4px;
+    font-weight: bold;
+    border: none;
+  }
+
+  .btn:hover {
+    background-color: #0056b3;
+  }
+</style>
+
+<style>
+  .submit {
+  	position: absolute;
+  	left: 0;
+  	bottom: 0;
+    display: inline-block;
+    padding: 0.5em 1em;
+    background-color: #007bff;
+    color: white;
+    text-decoration: none;
+    border-radius: 4px;
+    font-weight: bold;
+    border: none;
+  }
+
+  .btn:hover {
+    background-color: #0056b3;
+  }
+</style>
+
+
 </head>
 
 <body>
-  <div align="right">
-    <a th:href="@{/Logout}">Logout</a>
-  </div>
-
+  
   <h1>Home Page Studente</h1>
   Felice di vederti 
-  <span th:text="${session.user.name}">Giaco</span>
+  <span th:text="${session.user.name}">Giacomo</span>
   <span th:text="${session.user.surname}">Merlo</span>
 
   <p>Puoi usare il form qui sotto per selezionare una data d'appello:</p>
   
-  <div th:if="${#lists.isEmpty(courses)}">
+  <div th:if="${#lists.isEmpty(corsi)}">
   	<p>Nessun corso disponibile</p>
   </div>
-
-  <div class="form-wrapper">
- 
- <form>
-    <fieldset>
-	  <legend>Seleziona un corso:</legend>
-	  <label for="corsoSelect">Corso:</label>
-	  <select name="courseID" id="corsoSelect" required>
-	    <option value="" disabled selected>-- Seleziona un corso --</option>
-	     <option th:each="c : ${courses}"
-            th:value="${c.id}"
-            th:text="${'Corso ' + c.courseName + ' - Prof: ' + c.profName + ' ' + c.profSurname}">
-    </option>
-	  </select>
-	  <button type="submit">Conferma corso</button>
-	</fieldset>
- </form>
-
-    <div th:if="${#lists.isEmpty(exams)}">
-      -- Seleziona un corso --
-    </div>
-    <div th:if="${not #lists.isEmpty(exams)}">
-	  <form th:action="@{/GoToHomeStudent}" method="POST">
-	    <fieldset>
-	      <legend>Seleziona una data d'appello:</legend>
-	      <label for="appelloSelect">Appello:</label>
-		     <select name="courseID" id="appelloSelect" required>
-				<option value="" disabled selected>-- Seleziona una data --</option>
-				
-			 	<option th:each="e : ${exams}"
-			          th:value="${e.date}"    
-			          th:text="${#temporals.format(e.data, 'dd/MM/yyyy')}">
-			  	</option>
-			</select>
-	      <button type="submit">Conferma appello</button>
-	    </fieldset>
+  
+   <div th:if="${not #lists.isEmpty(corsi)}">
+  <form th:action="@{/GoToHomeStudent}" method="POST">
+  <fieldset>
+    <legend>Seleziona un corso:</legend>
+    <label for="SelectedCourse">Corso:</label>
+    <select name="SelectedCourse" id="SelectedCourse" required>
+      <option value="" disabled selected>-- Seleziona un corso --</option>
+      <option th:each="c : ${corsi}"
+              th:value="${c.id}"
+              th:text="${'Corso ' + c.courseName + ' - Prof: ' + c.profName + ' ' + c.profSurname}">
+      </option>
+    </select>
+  </fieldset>
+  
+    <button type="submit">Mostra le date d'appello</button>
 	  </form>
-	</div>
+	 </div>
 
+<form th:action="@{/SearchRound}" method="GET">
+  <fieldset>
+    <legend>Seleziona una data d'appello:</legend>
+    <label for="selectedExam">Appello:</label>
+    <select name="selectedExam" id="selectedExam" required>
+      <option value="" disabled selected>-- Seleziona una data --</option>
+      <option th:each="a : ${appello}"
+              th:value="${a.date}"    
+              th:text="${#temporals.format(a.date, 'dd/MM/yyyy')}">
+      </option>
+    </select>
+  </fieldset>
+
+  <button type="submit">Vai alla pagina dell'appello selezionato</button>
+</form>
+
+
+  <div align="left">
+    <a th:href="@{/Logout}" class="btn">Logout</a>
   </div>
 </body>
 </html>
