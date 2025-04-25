@@ -62,4 +62,17 @@ public class ExamDAO {
 		 }
 		 return name;
 	}
+    
+    public void rejectMark(int c, LocalDate d, int u) throws SQLException{
+    	String query = "UPDATE Iscrizioni_Appello SET stato='rifiutato' WHERE id_corso = ?, data = ?, id_studente = ? ;";
+    	try (PreparedStatement pstatement = con.prepareStatement(query)) {
+			 pstatement.setInt(1, c);
+			 pstatement.setString(2, (d).toString());
+			 pstatement.setInt(3, u);
+			 int updated = pstatement.executeUpdate();
+			 if (updated == 0) {
+			    throw new SQLException("Nessuna riga aggiornata");
+			 }
+		}
+    }
 }

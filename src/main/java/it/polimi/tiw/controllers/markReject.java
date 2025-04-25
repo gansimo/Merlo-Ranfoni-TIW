@@ -27,13 +27,13 @@ import it.polimi.tiw.daos.*;
 
 
 
-@WebServlet("/SearchRound")
-public class SearchRound extends HttpServlet {
+@WebServlet("/Reject")
+public class markReject extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	private Connection connection = null;
 	private TemplateEngine templateEngine;
 
-	public SearchRound() {
+	public markReject() {
 		super();
 		// TODO Auto-generated constructor stub
 	}
@@ -76,39 +76,49 @@ public class SearchRound extends HttpServlet {
 				return;
 			}
 		}
-		int id_corso = (Integer) s.getAttribute("selectedCourseID");
-		System.out.println(id_corso);
-		String data = request.getParameter("selectedExam");
-		request.getSession().setAttribute("selectedExamDate", data);
-		LocalDate date = LocalDate.parse(data);
-		int id = u.getId();
-		ExamDAO eDAO = new ExamDAO(connection, id, date, id_corso);
-		ExamResult examResult = null;
-		try {
-			examResult = eDAO.findExamData();
-		} catch (SQLException e) {
-			//throw new ServletException(e);
-			examResult = null;
- 		}
-		String courseName = null;
-		try {
-			courseName = eDAO.findExamName(id_corso);
-		} catch (SQLException e) {
-			//throw new ServletException(e);
-			response.sendError(HttpServletResponse.SC_BAD_GATEWAY, "Failure in database finding courseName");
- 		}
-		
-		String path = "/WEB-INF/StudentExamPage.html";
+		String path = "/WEB-INF/StudentRejectMarkPage.html";
 		JakartaServletWebApplication webApplication = JakartaServletWebApplication.buildApplication(getServletContext());
         WebContext ctx = new WebContext(webApplication.buildExchange(request, response), request.getLocale());
-
-        ctx.setVariable("nome_corso", courseName);
-		ctx.setVariable("esame", examResult);
+        
 		templateEngine.process(path, ctx, response.getWriter());
 	}
 
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
+		String loginpath = getServletContext().getContextPath() + "/index.html";
+		UserBean u = null;
+		HttpSession s = request.getSession();
+		if (s.isNew() || s.getAttribute("user") == null) {
+			response.sendRedirect(loginpath);
+			return;
+		} else {
+			u = (UserBean) s.getAttribute("user");
+			if (u.getCourse().equals("Docente")) {
+				response.sendRedirect(loginpath);
+				return;
+			}
+		}
+		int id_corso = (Integer) s.getAttribute("selectedCourseID");
+		String data = (String) s.getAttribute("selectedExamDate");
+		LocalDate date = LocalDate.parse(data);
+		int id = u.getId();
+		ExamDAO eDAO = new ExamDAO(connection, id, date, id_corso);
+		ExamResult examResult = null;
+		try {
+			eDAO.rejectMark(id_corso, date, id);
+		} catch (SQLException e) {
+			//throw new ServletException(e);
+ 		}
+		
+		
+		String path = getServletContext().getContextPath();
+		String target = "/SearchRound";
+		path = path + target;
+		JakartaServletWebApplication webApplication = JakartaServletWebApplication.buildApplication(getServletContext());
+        WebContext ctx = new WebContext(webApplication.buildExchange(request, response), request.getLocale());
+        
+		templateEngine.process(path, ctx, response.getWriter());
+		
 	}
 
 	public void destroy() {

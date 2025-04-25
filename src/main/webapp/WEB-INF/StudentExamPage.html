@@ -71,10 +71,11 @@ Impossibile caricare informazioni Appello
 <h3>Stato: <span th:text="${esame.state}">Non disturbare</span></h3>
 <hr>
 
-<div th:if="${esame.state == 'pubblicato'}">
-<a th:href="@{/Logout}" class="btn2">Rifiuta Voto</a>
+<div th:if="${esame.state == 'pubblicato' and esame.mark != 'assente' and esame.mark != 'rimandato' and esame.mark != 'riprovato'}">
+<form th:action="@{/Reject}" method="get">
+  <button type="submit" class="btn2">Rifiuta Voto</button>
+</form>
 <a th:href="@{/Logout}" class="btn">Logout</a>
-
 </div>
 </div>
 
