@@ -19,10 +19,17 @@
   <div th:if="${not #lists.isEmpty(availableCourses)}">
     <form th:action="@{/GoToHomeProfessor}" method="POST">
       <label for="scelta">Seleziona corso:</label>
-      <select name="scelta" id="scelta">
+      <select name="scelta" id="scelta" required>
+        <option value=""
+              th:if="${session.selectedCourseID == null}"
+              disabled
+              selected>
+        	    Seleziona un corso
+        </option>
         <option th:each="course : ${availableCourses}"
                 th:value="${course.id}"
-                th:text="${course.courseName}">
+                th:text="${course.courseName}"
+                th:selected="${course.id == session.selectedCourseID}">
         </option>
       </select>
       <button type="submit">Mostra le date d'appello</button>

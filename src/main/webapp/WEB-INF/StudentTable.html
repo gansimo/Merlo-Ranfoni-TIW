@@ -26,15 +26,66 @@
   </div>
   <table>
     <thead>
-      <tr>
-        <th> <a th:href="@{/OrderStudentTable(column='u.matricola')}">Matricola</a></th>
-        <th> <a th:href="@{/OrderStudentTable(column='u.cognome')}">Cognome</a></th>
-        <th> <a th:href="@{/OrderStudentTable(column='u.nome')}">Nome</a></th>
-        <th> <a th:href="@{/OrderStudentTable(column='u.mail')}">Email</a></th>
-        <th> <a th:href="@{/OrderStudentTable(column='u.corso_laurea')}">Corso di laurea</a></th>
-        <th> <a th:href="@{/OrderStudentTable(column='i.voto')}">Voto</a></th>
-        <th> <a th:href="@{/OrderStudentTable(column='i.stato')}">Stato valutazione</a></th>
-      </tr>
+      <tr th:with="
+      col=${session.lastOrderCol},
+      dir=${session.lastOrderDir}">
+  <th>
+    <a th:href="@{/OrderStudentTable(column='u.matricola')}"
+       th:text="${col == 'u.matricola'} 
+                 ? 'Matricola ' + (${dir == 'ASC'} ? '▲' : '▼') 
+                 : 'Matricola'">
+                 Matricola
+    </a>
+  </th>
+  <th>
+    <a th:href="@{/OrderStudentTable(column='u.cognome')}"
+       th:text="${col == 'u.cognome'} 
+                 ? 'Cognome ' + (${dir == 'ASC'} ? '▲' : '▼')  
+                 : 'Cognome'">
+                 Cognome
+    </a>
+  </th>
+  <th>
+    <a th:href="@{/OrderStudentTable(column='u.nome')}"
+       th:text="${col == 'u.nome'} 
+                 ? 'Nome ' + (${dir == 'ASC'} ? '▲' : '▼')  
+                 : 'Nome'">
+                 Nome
+    </a>
+  </th>
+  <th>
+    <a th:href="@{/OrderStudentTable(column='u.mail')}"
+       th:text="${col == 'u.mail'} 
+                 ? 'Email ' + (${dir == 'ASC'} ? '▲' : '▼')  
+                 : 'Email'">
+                 Email
+    </a>
+  </th>
+  <th>
+    <a th:href="@{/OrderStudentTable(column='u.corso_laurea')}"
+       th:text="${col == 'u.corso_laurea'} 
+                 ? 'Corso di laurea ' + (${dir == 'ASC'} ? '▲' : '▼')  
+                 : 'Corso di laurea'">
+                 Corso di laurea
+    </a>
+  </th>
+  <th>
+    <a th:href="@{/OrderStudentTable(column='i.voto')}"
+       th:text="${col == 'i.voto'} 
+                 ? 'Voto ' + (${dir == 'ASC'} ? '▲' : '▼')  
+                 : 'Voto'">
+                 Voto
+    </a>
+  </th>
+  <th>
+    <a th:href="@{/OrderStudentTable(column='i.stato')}"
+       th:text="${col == 'i.stato'} 
+                 ? 'Stato valutazione ' + (${dir == 'ASC'} ? '▲' : '▼')  
+                 : 'Stato valutazione'">
+                 Stato valutazione
+    </a>
+  </th>
+</tr>
     </thead>
     <tbody th:remove="all-but-first">
       <!-- 1) questo TR è il “template” dinamico -->

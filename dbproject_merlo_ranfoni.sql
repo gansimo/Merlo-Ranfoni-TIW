@@ -132,12 +132,6 @@ VALUES
 (1, 2),
 (1, 3);
 
--- 🧾 ISCRIZIONI all'appello
-INSERT INTO Iscrizioni_Appello (id_corso, data, id_studente)
-VALUES 
-(1, '2024-06-15', 2),
-(1, '2024-06-15', 3);
-
 -- 1) Inserisco Mario Rossi
 INSERT INTO Utente (mail, psw, nome, cognome, matricola, corso_laurea)
 VALUES 
@@ -180,40 +174,75 @@ INSERT INTO Appello (id_corso, data,     id_verbale, data_verbale,   ora_verbale
   (5, '2024-09-18', 5002, '2024-09-23', '2024-09-23 09:00:00'),
   (5, '2024-11-28', 5003, '2024-12-03', '2024-12-03 09:00:00'),
   (5, '2025-01-22', 5004, '2025-01-27', '2025-01-27 09:00:00');
-
--- 4) Iscrivo Mario Rossi (id_studente = 4) ai 4 corsi
-INSERT INTO Iscrizioni_Corsi (id_corso, id_studente) VALUES
-  (2, 4),
-  (3, 4),
-  (4, 4),
-  (5, 4);
-
--- 5) Iscrivo Mario Rossi a tutti gli appelli di ciascun corso
-INSERT INTO Iscrizioni_Appello (id_corso, data,     id_studente) VALUES
-  -- Algoritmi (corso 2)
-  (2, '2024-07-01', 4),
-  (2, '2024-09-10', 4),
-  (2, '2024-11-20', 4),
-  (2, '2025-01-15', 4),
-
-  -- Reti di Calcolatori (corso 3)
-  (3, '2024-07-05', 4),
-  (3, '2024-09-12', 4),
-  (3, '2024-11-22', 4),
-  (3, '2025-01-18', 4),
-
-  -- Sistemi Operativi (corso 4)
-  (4, '2024-07-08', 4),
-  (4, '2024-09-15', 4),
-  (4, '2024-11-25', 4),
-  (4, '2025-01-20', 4),
-
-  -- Calcolo Numerico (corso 5)
-  (5, '2024-07-10', 4),
-  (5, '2024-09-18', 4),
-  (5, '2024-11-28', 4),
-  (5, '2025-01-22', 4);
   
+  
+  
+  -- aggiunte per incrementare il db
+  
+  INSERT INTO Utente (mail, psw, nome, cognome, matricola, corso_laurea) VALUES
+  ('docente2@uni.it', 'pswDoc2', 'Giulia',    'Verdi',    NULL, 'Docente'),
+  ('docente3@uni.it', 'pswDoc3', 'Alessandro','Neri',     NULL, 'Docente'),
+  ('docente4@uni.it', 'pswDoc4', 'Federica',  'Gialli',   NULL, 'Docente'),
+  ('docente5@uni.it', 'pswDoc5', 'Davide',    'Azzurri',  NULL, 'Docente');
+
+DELIMITER $$
+
+DROP PROCEDURE IF EXISTS populate_students_courses$$
+CREATE PROCEDURE populate_students_courses()
+BEGIN
+    DECLARE i       INT DEFAULT 1;
+    DECLARE sid     INT;
+    DECLARE email   VARCHAR(50);
+    DECLARE nome    VARCHAR(30);
+    DECLARE cognome VARCHAR(30);
+    DECLARE matricola VARCHAR(10);
+    DECLARE corso_laurea VARCHAR(20);
+
+    WHILE i <= 50 DO
+        -- compongo valori
+        SET email        = CONCAT('studente', LPAD(i,2,'0'), '@uni.it');
+        SET nome         = CONCAT('Stud', i);
+        SET cognome      = CONCAT('Test',  i);
+        SET matricola    = CONCAT('S', LPAD(100000 + i, 6, '0'));
+        SET corso_laurea = ELT(
+            ((i-1) MOD 5) + 1,
+            'Informatica','Fisica','Matematica','Chimica','Ingegneria'
+        );
+
+        -- 1) inserisco lo studente
+        INSERT INTO Utente(mail, psw, nome, cognome, matricola, corso_laurea)
+        VALUES (
+            email,
+            CONCAT('psw', i),
+            nome,
+            cognome,
+            matricola,
+            corso_laurea
+        );
+        SET sid = LAST_INSERT_ID();
+
+        -- 2) lo iscrivo a uno dei 5 corsi (10 studenti ciascuno)
+        INSERT INTO Iscrizioni_Corsi(id_corso, id_studente)
+        VALUES ( FLOOR((i-1)/10) + 1, sid );
+
+        SET i = i + 1;
+    END WHILE;
+END$$
+
+DELIMITER ;
+
+CALL populate_students_courses();
+DROP PROCEDURE populate_students_courses;
+
+INSERT INTO Iscrizioni_Appello (id_corso, data, id_studente)
+SELECT
+  ic.id_corso,
+  a.data,
+  ic.id_studente
+FROM Iscrizioni_Corsi ic
+JOIN Appello a
+  ON a.id_corso = ic.id_corso;
+
   
 -- SELECT * FROM Utente;
 -- SELECT * FROM Corso;
