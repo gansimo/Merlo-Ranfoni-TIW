@@ -20,7 +20,7 @@ public class CourseDAO{
 	
 	public List<Exam> findExams() throws SQLException {
 		List<Exam> exams = new ArrayList<Exam>();
-		String query = "SELECT data, id_verbale, data_verbale, ora_verbale FROM Appello WHERE id_corso = ? ORDER BY data ASC;";
+		String query = "SELECT data FROM Appello WHERE id_corso = ? ORDER BY data ASC;";
 		try (PreparedStatement pstatement = con.prepareStatement(query)) {
 	        pstatement.setInt(1, this.id);
 	        
@@ -29,14 +29,6 @@ public class CourseDAO{
 	                Exam exam = new Exam();
 	                exam.setCourseID(this.id);
 	                exam.setDate(result.getDate("data").toLocalDate());
-	                
-	                int verbID = result.getInt("id_verbale");
-	                if (!result.wasNull()) {
-	                    exam.setVerbalID(verbID);
-	                    exam.setVerbalDate(result.getDate("data_verbale").toLocalDate());
-	                    exam.setVerbalHour(result.getTime("ora_verbale").toLocalTime());
-	                }
-	                
 	                exams.add(exam);
 	            }
 	        }

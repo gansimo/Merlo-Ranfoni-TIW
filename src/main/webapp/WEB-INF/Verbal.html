@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>Verbale</title>
+  <style>
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      margin-bottom: 2rem;
+    }
+    th, td {
+      border: 1px solid #666;
+      padding: 0.5rem;
+      text-align: left;
+    }
+    thead {
+      background-color: #f0f0f0;
+    }
+  </style>
+</head>
+<body>
+  <h2>Elenco Studenti del Verbale</h2>
+  <div align="right">
+		<a th:href="@{/Logout}">Logout</a>
+  </div>
+  <table>
+    <thead>
+      <tr>
+  <th>
+                 Matricola
+  </th>
+  <th>
+                 Cognome
+  </th>
+  <th>
+                 Nome
+  </th>
+  <th>
+                 Email
+  </th>
+  <th>
+                 Corso di laurea
+  </th>
+  <th>
+                 Voto
+  </th>
+  <th>
+                 Stato valutazione
+  </th>
+</tr>
+    </thead>
+    <tbody th:remove="all-but-first">
+      <!-- 1) questo TR è il “template” dinamico -->
+      <tr th:each="student : ${studentTable}">
+        <td th:text="${student.matr}">[matricola]</td>
+        <td th:text="${student.surname}">[cognome]</td>
+        <td th:text="${student.name}">[nome]</td>
+        <td th:text="${student.mail}">[email]</td>
+        <td th:text="${student.course}">[corso]</td>
+        <td th:text="${student.grade}">[voto]</td>
+        <td th:text="${student.state}">[stato]</td>
+      </tr>
+
+      <tr>
+        <td>20201234</td>
+        <td>Rossi</td>
+        <td>Luigi</td>
+        <td>l.rossi@example.com</td>
+        <td>Ingegneria Informatica</td>
+        <td>28</td>
+        <td>pubblicato</td>
+      </tr>
+      <tr>
+        <td>20205678</td>
+        <td>Bianchi</td>
+        <td>Maria</td>
+        <td>m.bianchi@example.com</td>
+        <td>Matematica</td>
+        <td>30 e lode</td>
+        <td>verbalizzato</td>
+      </tr>
+      <tr>
+        <td>20209876</td>
+        <td>Verdi</td>
+        <td>Anna</td>
+        <td>a.verdi@example.com</td>
+        <td>Fisica</td>
+        <td>assente</td>
+        <td>rifiutato</td>
+      </tr>
+    </tbody>
+  </table>
+ 
+  <div align="right">
+		<a th:href="@{/GoToHomeProfessor}">Torna alla Home</a>
+  </div>
+
+</body>
+</html>

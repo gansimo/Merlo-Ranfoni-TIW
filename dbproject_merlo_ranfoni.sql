@@ -7,6 +7,8 @@ USE `DBProject_Merlo_Ranfoni`;
 -- DROP in ordine corretto per evitare errori di dipendenze
 DROP TABLE IF EXISTS Iscrizioni_Corsi;
 DROP TABLE IF EXISTS Iscrizioni_Appello;
+DROP TABLE IF EXISTS Studenti_Verbale;
+DROP TABLE IF EXISTS Verbale;
 DROP TABLE IF EXISTS Appello;
 DROP TABLE IF EXISTS Corso;
 DROP TABLE IF EXISTS Utente;
@@ -79,11 +81,28 @@ CREATE TABLE Corso (
 CREATE TABLE Appello (
     `id_corso` INT NOT NULL,
     `data` DATE NOT NULL,
-    `id_verbale` INT UNIQUE,
-    `data_verbale` DATE,
-    `ora_verbale` TIMESTAMP,
     PRIMARY KEY (`id_corso`, `data`),
     CONSTRAINT fk_appello_corso FOREIGN KEY (`id_corso`) REFERENCES Corso(`id`) ON UPDATE CASCADE ON DELETE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+-- TABELLA: Verbale
+CREATE TABLE Verbale (
+	`id` INT NOT NULL AUTO_INCREMENT,
+    `data_verbale` DATE,
+    `ora_verbale` TIMESTAMP,
+	`id_corso` INT NOT NULL,
+    `data` DATE NOT NULL,
+	PRIMARY KEY (`id`),
+	CONSTRAINT fk_verbale_appello FOREIGN KEY (`id_corso`, `data`) REFERENCES Appello(`id_corso`, `data`) ON UPDATE CASCADE ON DELETE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+-- TABELLA: Studenti_Verbale
+CREATE TABLE Studenti_Verbale (
+	`id_verbale` INT NOT NULL,
+	`id_studente` INT NOT NULL,
+	PRIMARY KEY (`id_verbale`, `id_studente`),
+	CONSTRAINT fk_stdverb_verb FOREIGN KEY (`id_verbale`) REFERENCES Verbale(`id`),
+	CONSTRAINT fk_stdverb_studente FOREIGN KEY (`id_studente`) REFERENCES Utente(`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- TABELLA: Iscrizioni_Appello
@@ -123,8 +142,8 @@ INSERT INTO Corso (nome, anno, id_prof)
 VALUES ('Basi di Dati', 2024, 1); -- ID 1
 
 -- 📅 APPELLO del corso
-INSERT INTO Appello (id_corso, data, id_verbale, data_verbale, ora_verbale)
-VALUES (1, '2024-06-15', 1001, '2024-06-20', '2024-06-20 10:00:00');
+INSERT INTO Appello (id_corso, data)
+VALUES (1, '2024-06-15');
 
 -- 📝 ISCRIZIONI al corso per gli studenti
 INSERT INTO Iscrizioni_Corsi (id_corso, id_studente)
@@ -148,32 +167,32 @@ INSERT INTO Corso (nome, anno, id_prof) VALUES
 --    (id_verbale univoco, data_verbale 5 giorni dopo, ora alle 09:00)
 
 -- Corso 2: Algoritmi
-INSERT INTO Appello (id_corso, data,     id_verbale, data_verbale,   ora_verbale) VALUES
-  (2, '2024-07-01', 2001, '2024-07-06', '2024-07-06 09:00:00'),
-  (2, '2024-09-10', 2002, '2024-09-15', '2024-09-15 09:00:00'),
-  (2, '2024-11-20', 2003, '2024-11-25', '2024-11-25 09:00:00'),
-  (2, '2025-01-15', 2004, '2025-01-20', '2025-01-20 09:00:00');
+INSERT INTO Appello (id_corso, data) VALUES
+  (2, '2024-07-01'),
+  (2, '2024-09-10'),
+  (2, '2024-11-20'),
+  (2, '2025-01-15');
 
 -- Corso 3: Reti di Calcolatori
-INSERT INTO Appello (id_corso, data,     id_verbale, data_verbale,   ora_verbale) VALUES
-  (3, '2024-07-05', 3001, '2024-07-10', '2024-07-10 09:00:00'),
-  (3, '2024-09-12', 3002, '2024-09-17', '2024-09-17 09:00:00'),
-  (3, '2024-11-22', 3003, '2024-11-27', '2024-11-27 09:00:00'),
-  (3, '2025-01-18', 3004, '2025-01-23', '2025-01-23 09:00:00');
+INSERT INTO Appello (id_corso, data) VALUES
+  (3, '2024-07-05'),
+  (3, '2024-09-12'),
+  (3, '2024-11-22'),
+  (3, '2025-01-18');
 
 -- Corso 4: Sistemi Operativi
-INSERT INTO Appello (id_corso, data,     id_verbale, data_verbale,   ora_verbale) VALUES
-  (4, '2024-07-08', 4001, '2024-07-13', '2024-07-13 09:00:00'),
-  (4, '2024-09-15', 4002, '2024-09-20', '2024-09-20 09:00:00'),
-  (4, '2024-11-25', 4003, '2024-11-30', '2024-11-30 09:00:00'),
-  (4, '2025-01-20', 4004, '2025-01-25', '2025-01-25 09:00:00');
+INSERT INTO Appello (id_corso, data) VALUES
+  (4, '2024-07-08'),
+  (4, '2024-09-15'),
+  (4, '2024-11-25'),
+  (4, '2025-01-20');
 
 -- Corso 5: Calcolo Numerico
-INSERT INTO Appello (id_corso, data,     id_verbale, data_verbale,   ora_verbale) VALUES
-  (5, '2024-07-10', 5001, '2024-07-15', '2024-07-15 09:00:00'),
-  (5, '2024-09-18', 5002, '2024-09-23', '2024-09-23 09:00:00'),
-  (5, '2024-11-28', 5003, '2024-12-03', '2024-12-03 09:00:00'),
-  (5, '2025-01-22', 5004, '2025-01-27', '2025-01-27 09:00:00');
+INSERT INTO Appello (id_corso, data) VALUES
+  (5, '2024-07-10'),
+  (5, '2024-09-18'),
+  (5, '2024-11-28'),
+  (5, '2025-01-22');
   
   
   

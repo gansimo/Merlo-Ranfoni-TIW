@@ -122,13 +122,64 @@ public class StudentTableDAO {
 		}
 	}
 	
-	public void verbalizeGrades(int courseID, String date) throws SQLException {
-		String query = "UPDATE Iscrizioni_Appello SET stato = ? WHERE id_corso = ? AND data = ? AND stato = 'pubblicato'";
+	public int verbalizeGrades(int courseID, String date) throws SQLException {
+		String query = "UPDATE Iscrizioni_Appello SET stato = ? WHERE id_corso = ? AND data = ? AND (stato = 'pubblicato' OR stato = 'rifiutato')";
 		try (PreparedStatement pstatement = con.prepareStatement(query);) {
 			pstatement.setString(1, "verbalizzato");
 			pstatement.setInt(2, courseID);
 			pstatement.setString(3, date);
-			pstatement.executeUpdate();
+			
+			return pstatement.executeUpdate();
+		}
+	}
+	
+	public List<RegisteredStudent> getNewVerbalizedStudents(int courseID, String date) throws SQLException {
+		List<RegisteredStudent> students = new ArrayList<>();
+		
+		String query = "SELECT \n"
+				+ "    u.id,\n"
+				+ "    u.matricola,\n"
+				+ "    u.cognome,\n"
+				+ "    u.nome,\n"
+				+ "    u.mail,\n"
+				+ "    u.corso_laurea,\n"
+				+ "    i.voto,\n"
+				+ "    i.stato\n"
+				+ "FROM Iscrizioni_Appello AS i\n"
+				+ "JOIN Utente AS u \n"
+				+ "    ON i.id_studente = u.id\n"
+				+ "\n"
+				+ "WHERE \n"
+				+ "    i.id_corso = ? \n"
+				+ "    AND i.data = ? \n"
+				+ "	AND i.stato = 'verbalizzato'\n"
+				+ "    AND NOT EXISTS (\n"
+				+ "        SELECT *\n"
+				+ "        FROM Studenti_Verbale AS sv JOIN Verbale AS v\n"
+				+ "        WHERE sv.id_verbale  = v.id\n"
+				+ "          AND sv.id_studente = u.id\n"
+				+ "    );\n"
+				+ "";
+		
+		try (PreparedStatement pstatement = con.prepareStatement(query);) {
+			pstatement.setInt(1, courseID);
+			pstatement.setString(2, date);
+			try (ResultSet result = pstatement.executeQuery()) {
+                while (result.next()) {
+                    RegisteredStudent stud = new RegisteredStudent();
+                    stud.setId(result.getInt("id"));
+                    stud.setMatr(result.getString("matricola"));
+                    stud.setSurname(result.getString("cognome"));
+                    stud.setName(result.getString("nome"));
+                    stud.setMail(result.getString("mail"));
+                    stud.setCourse(result.getString("corso_laurea"));
+                    stud.setGrade(result.getString("voto"));
+                    stud.setState(result.getString("stato"));
+                    
+                    students.add(stud);
+                }
+            }
+		return students;
 		}
 	}
 	
