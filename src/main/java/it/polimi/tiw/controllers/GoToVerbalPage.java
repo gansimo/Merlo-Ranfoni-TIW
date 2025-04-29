@@ -10,14 +10,13 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
 import java.io.IOException;
-import java.net.URLEncoder;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.List;
 
 import org.thymeleaf.TemplateEngine;
+import org.thymeleaf.context.WebContext;
 import org.thymeleaf.templatemode.TemplateMode;
 import org.thymeleaf.templateresolver.WebApplicationTemplateResolver;
 import org.thymeleaf.web.servlet.JakartaServletWebApplication;
@@ -25,25 +24,23 @@ import org.thymeleaf.web.servlet.JakartaServletWebApplication;
 import it.polimi.tiw.beans.RegisteredStudent;
 import it.polimi.tiw.beans.UserBean;
 import it.polimi.tiw.beans.VerbalBean;
-import it.polimi.tiw.daos.StudentTableDAO;
-import it.polimi.tiw.daos.VerbalDAO;
 
 /**
- * Servlet implementation class VerbalizeGrades
+ * Servlet implementation class GoToVerbalPage
  */
-@WebServlet("/VerbalizeGrades")
-public class VerbalizeGrades extends HttpServlet {
+@WebServlet("/GoToVerbalPage")
+public class GoToVerbalPage extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	private TemplateEngine templateEngine;
-	private Connection connection = null;
        
     /**
      * @see HttpServlet#HttpServlet()
      */
-    public VerbalizeGrades() {
+    public GoToVerbalPage() {
         super();
         // TODO Auto-generated constructor stub
     }
+    
     
     public void init() throws ServletException {
 		ServletContext servletContext = getServletContext();
@@ -53,23 +50,7 @@ public class VerbalizeGrades extends HttpServlet {
 		this.templateEngine = new TemplateEngine();
 		this.templateEngine.setTemplateResolver(templateResolver);
 		templateResolver.setSuffix(".html");
-		
-		try {
-			ServletContext context = getServletContext();
-			String driver = context.getInitParameter("dbDriver");
-			String url = context.getInitParameter("dbUrl");
-			String user = context.getInitParameter("dbUser");
-			String password = context.getInitParameter("dbPassword");
-			Class.forName(driver);
-			connection = DriverManager.getConnection(url, user, password);
-
-		} catch (ClassNotFoundException e) {
-			throw new UnavailableException("Can't load database driver");
-		} catch (SQLException e) {
-			throw new UnavailableException("Couldn't get db connection");
 		}
-	}
-
 
 	/**
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
@@ -89,23 +70,12 @@ public class VerbalizeGrades extends HttpServlet {
 			}
 		}
 		
-		StudentTableDAO stDAO = new StudentTableDAO(connection);
-		int selectedCourseID = (Integer) s.getAttribute("selectedCourseID");
-		String selectedDate = (String) s.getAttribute("selectedDate");
+		String path = "/WEB-INF/Verbal.html";
+		JakartaServletWebApplication webApplication = JakartaServletWebApplication.buildApplication(getServletContext());
+        WebContext ctx = new WebContext(webApplication.buildExchange(request, response), request.getLocale());
+
+		templateEngine.process(path, ctx, response.getWriter());
 		
-		int updatedStudents = 0;
-		
-		try {
-			updatedStudents = stDAO.verbalizeGrades(selectedCourseID, selectedDate);
-			System.out.println("ciao");
-		} catch (SQLException e) {
-			//throw new ServletException(e);
-			response.sendError(HttpServletResponse.SC_BAD_GATEWAY, "Failure in database verbalizing grades");
- 		}
-		if(updatedStudents == 0)
-			response.sendRedirect(request.getContextPath() + "/GoToStudentTable?date=" + URLEncoder.encode(selectedDate, "UTF-8"));
-		else 
-			response.sendRedirect(request.getContextPath() + "/Verbal");
 	}
 
 	/**

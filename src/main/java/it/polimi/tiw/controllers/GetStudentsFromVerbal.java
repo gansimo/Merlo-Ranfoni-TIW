@@ -10,7 +10,6 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
 import java.io.IOException;
-import java.net.URLEncoder;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -29,10 +28,10 @@ import it.polimi.tiw.daos.StudentTableDAO;
 import it.polimi.tiw.daos.VerbalDAO;
 
 /**
- * Servlet implementation class VerbalizeGrades
+ * Servlet implementation class GetStudentsFromVerbal
  */
-@WebServlet("/VerbalizeGrades")
-public class VerbalizeGrades extends HttpServlet {
+@WebServlet("/GetStudentsFromVerbal")
+public class GetStudentsFromVerbal extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	private TemplateEngine templateEngine;
 	private Connection connection = null;
@@ -40,20 +39,12 @@ public class VerbalizeGrades extends HttpServlet {
     /**
      * @see HttpServlet#HttpServlet()
      */
-    public VerbalizeGrades() {
+    public GetStudentsFromVerbal() {
         super();
         // TODO Auto-generated constructor stub
     }
     
     public void init() throws ServletException {
-		ServletContext servletContext = getServletContext();
-		JakartaServletWebApplication webApplication = JakartaServletWebApplication.buildApplication(servletContext);
-		WebApplicationTemplateResolver templateResolver = new WebApplicationTemplateResolver(webApplication);
-		templateResolver.setTemplateMode(TemplateMode.HTML);
-		this.templateEngine = new TemplateEngine();
-		this.templateEngine.setTemplateResolver(templateResolver);
-		templateResolver.setSuffix(".html");
-		
 		try {
 			ServletContext context = getServletContext();
 			String driver = context.getInitParameter("dbDriver");
@@ -69,7 +60,6 @@ public class VerbalizeGrades extends HttpServlet {
 			throw new UnavailableException("Couldn't get db connection");
 		}
 	}
-
 
 	/**
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
@@ -90,22 +80,33 @@ public class VerbalizeGrades extends HttpServlet {
 		}
 		
 		StudentTableDAO stDAO = new StudentTableDAO(connection);
-		int selectedCourseID = (Integer) s.getAttribute("selectedCourseID");
-		String selectedDate = (String) s.getAttribute("selectedDate");
+		int verbalID = Integer.parseInt(request.getParameter("verbalID"));
+		List<RegisteredStudent> students = new ArrayList<RegisteredStudent>();
 		
-		int updatedStudents = 0;
 		
 		try {
-			updatedStudents = stDAO.verbalizeGrades(selectedCourseID, selectedDate);
+			students = stDAO.getStudentsFromVerbal(verbalID);
 			System.out.println("ciao");
 		} catch (SQLException e) {
 			//throw new ServletException(e);
-			response.sendError(HttpServletResponse.SC_BAD_GATEWAY, "Failure in database verbalizing grades");
+			response.sendError(HttpServletResponse.SC_BAD_GATEWAY, "Failure in database finding student table");
  		}
-		if(updatedStudents == 0)
-			response.sendRedirect(request.getContextPath() + "/GoToStudentTable?date=" + URLEncoder.encode(selectedDate, "UTF-8"));
-		else 
-			response.sendRedirect(request.getContextPath() + "/Verbal");
+		
+		VerbalDAO vDAO = new VerbalDAO(connection);
+		VerbalBean verb = new VerbalBean();
+		
+		try {
+			verb = vDAO.getVerbal(verbalID);
+			System.out.println("ciao");
+		} catch (SQLException e) {
+			//throw new ServletException(e);
+			response.sendError(HttpServletResponse.SC_BAD_GATEWAY, "Failure in database finding student table");
+ 		}
+		
+		s.setAttribute("studentTable", students);
+		s.setAttribute("verbal", verb);
+		
+		response.sendRedirect(request.getContextPath() + "/GoToVerbalPage");
 	}
 
 	/**

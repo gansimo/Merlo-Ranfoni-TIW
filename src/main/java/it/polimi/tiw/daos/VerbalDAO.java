@@ -9,6 +9,9 @@ import java.sql.Statement;
 import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
+import java.time.temporal.TemporalUnit;
+import java.util.ArrayList;
 import java.util.List;
 
 import it.polimi.tiw.beans.RegisteredStudent;
@@ -26,11 +29,11 @@ private Connection con;
 		String query = "INSERT INTO Verbale (data_verbale, ora_verbale, id_corso, data) VALUES (?, ?, ?, ?)" ;
 		VerbalBean verb = new VerbalBean();
 		
-		try (PreparedStatement pstatement = con.prepareStatement(query);) {
+		try (PreparedStatement pstatement = con.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);) {
 			String actualDate = Date.valueOf(LocalDate.now()).toString();
-			String actualHour = Timestamp.valueOf(LocalDateTime.now()).toString();
+			String actualHour = Timestamp.valueOf(LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS)).toString();
 			pstatement.setDate(1, Date.valueOf(LocalDate.now()));
-			pstatement.setTimestamp(2, Timestamp.valueOf(LocalDateTime.now()));
+			pstatement.setTimestamp(2, Timestamp.valueOf(LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS)));
 			pstatement.setInt(3, courseID);
 			pstatement.setString(4, examDate);
 			pstatement.executeUpdate();
@@ -39,8 +42,17 @@ private Connection con;
 			verb.setCourseID(courseID);
 			verb.setExamDate(examDate);
 			verb.setHour(actualHour);
-			verb.setID(Statement.RETURN_GENERATED_KEYS);
+			
+			try (ResultSet rs = pstatement.getGeneratedKeys()) {
+		        if (rs.next()) {
+		            verb.setID(rs.getInt(1));
+		        } else {
+		            throw new SQLException("No row inserted");
+		        }
+			}
+			
 			verb.setDate(actualDate);
+			
 			return verb;
 		}
 	}
@@ -56,6 +68,72 @@ private Connection con;
 				pstatement.executeUpdate();
 			}
 		}
+	}
+	
+	public List<VerbalBean> getVerbals(int profID) throws SQLException{
+		List<VerbalBean> verbals = new ArrayList<VerbalBean>();
+		
+		String query = "SELECT \r\n"
+				+ "    v.id,\r\n"
+				+ "    v.data_verbale,\r\n"
+				+ "    v.ora_verbale,\r\n"
+				+ "    v.id_corso,\r\n"
+				+ "    v.data,\r\n"
+				+ "    c.nome\r\n"
+				+ "FROM Verbale v\r\n"
+				+ "JOIN Corso c \r\n"
+				+ "  ON v.id_corso = c.id\r\n"
+				+ "WHERE c.id_prof = ?\r\n"
+				+ "ORDER BY \r\n"
+				+ "  c.nome      ASC,\r\n"
+				+ "  v.data      ASC;\r\n"
+				+ "";
+		
+		try (PreparedStatement pstatement = con.prepareStatement(query);) {
+			pstatement.setInt(1, profID);
+			try (ResultSet result = pstatement.executeQuery()) {
+                while (result.next()) {
+                	VerbalBean verb = new VerbalBean();
+                	verb.setCourseID(result.getInt("id_corso"));
+                	verb.setDate(result.getDate("data_verbale").toString());
+                	verb.setExamDate(result.getDate("data").toString());
+                	verb.setHour(result.getTimestamp("ora_verbale").toString());
+                	verb.setID(result.getInt("id"));
+                	verb.setCourseName(result.getString("nome"));
+                	
+                	verbals.add(verb);
+                }
+			}
+		}
+		return verbals;
+	}
+	
+	public VerbalBean getVerbal(int verbalID) throws SQLException {
+		VerbalBean verb = new VerbalBean();
+		String query = "SELECT\r\n"
+				+ "    id,\r\n"
+				+ "    data_verbale,\r\n"
+				+ "    ora_verbale,\r\n"
+				+ "    id_corso,\r\n"
+				+ "    data\r\n"
+				+ "FROM Verbale\r\n"
+				+ "WHERE id = ?\r\n"
+				+ ";\r\n"
+				+ "";
+		try (PreparedStatement pstatement = con.prepareStatement(query);) {
+			pstatement.setInt(1, verbalID);
+			try (ResultSet result = pstatement.executeQuery()) {
+                while (result.next()) {
+                	verb.setCourseID(result.getInt("id_corso"));
+                	verb.setDate(result.getDate("data_verbale").toString());
+                	verb.setExamDate(result.getDate("data").toString());
+                	verb.setHour(result.getTimestamp("ora_verbale").toString());
+                	verb.setID(result.getInt("id"));
+                }
+			}
+		}
+		return verb;
+		
 	}
 	
 }

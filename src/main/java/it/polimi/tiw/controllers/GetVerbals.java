@@ -10,7 +10,6 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
 import java.io.IOException;
-import java.net.URLEncoder;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -18,21 +17,20 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.thymeleaf.TemplateEngine;
+import org.thymeleaf.context.WebContext;
 import org.thymeleaf.templatemode.TemplateMode;
 import org.thymeleaf.templateresolver.WebApplicationTemplateResolver;
 import org.thymeleaf.web.servlet.JakartaServletWebApplication;
 
-import it.polimi.tiw.beans.RegisteredStudent;
 import it.polimi.tiw.beans.UserBean;
 import it.polimi.tiw.beans.VerbalBean;
-import it.polimi.tiw.daos.StudentTableDAO;
 import it.polimi.tiw.daos.VerbalDAO;
 
 /**
- * Servlet implementation class VerbalizeGrades
+ * Servlet implementation class GetVerbals
  */
-@WebServlet("/VerbalizeGrades")
-public class VerbalizeGrades extends HttpServlet {
+@WebServlet("/GetVerbals")
+public class GetVerbals extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	private TemplateEngine templateEngine;
 	private Connection connection = null;
@@ -40,7 +38,7 @@ public class VerbalizeGrades extends HttpServlet {
     /**
      * @see HttpServlet#HttpServlet()
      */
-    public VerbalizeGrades() {
+    public GetVerbals() {
         super();
         // TODO Auto-generated constructor stub
     }
@@ -70,7 +68,6 @@ public class VerbalizeGrades extends HttpServlet {
 		}
 	}
 
-
 	/**
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
@@ -89,23 +86,25 @@ public class VerbalizeGrades extends HttpServlet {
 			}
 		}
 		
-		StudentTableDAO stDAO = new StudentTableDAO(connection);
-		int selectedCourseID = (Integer) s.getAttribute("selectedCourseID");
-		String selectedDate = (String) s.getAttribute("selectedDate");
+		VerbalDAO vDAO = new VerbalDAO(connection);
+		List<VerbalBean> verbs = new ArrayList<VerbalBean>();
 		
-		int updatedStudents = 0;
 		
 		try {
-			updatedStudents = stDAO.verbalizeGrades(selectedCourseID, selectedDate);
+			verbs = vDAO.getVerbals(u.getId());
 			System.out.println("ciao");
 		} catch (SQLException e) {
-			//throw new ServletException(e);
-			response.sendError(HttpServletResponse.SC_BAD_GATEWAY, "Failure in database verbalizing grades");
+			throw new ServletException(e);
+			//response.sendError(HttpServletResponse.SC_BAD_GATEWAY, "Failure in database finding verbals table");
  		}
-		if(updatedStudents == 0)
-			response.sendRedirect(request.getContextPath() + "/GoToStudentTable?date=" + URLEncoder.encode(selectedDate, "UTF-8"));
-		else 
-			response.sendRedirect(request.getContextPath() + "/Verbal");
+		
+		String path = "/WEB-INF/AllVerbals.html";
+		JakartaServletWebApplication webApplication = JakartaServletWebApplication.buildApplication(getServletContext());
+        WebContext ctx = new WebContext(webApplication.buildExchange(request, response), request.getLocale());
+        ctx.setVariable("verbalTable", verbs);
+
+		templateEngine.process(path, ctx, response.getWriter());
+		
 	}
 
 	/**

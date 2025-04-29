@@ -1,5 +1,6 @@
 package it.polimi.tiw.controllers;
 
+import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.ServletContext;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.UnavailableException;
@@ -119,13 +120,23 @@ public class Verbal extends HttpServlet {
 			//response.sendError(HttpServletResponse.SC_BAD_GATEWAY, "Failure in database finding student table");
  		}
 		
-		String path = "/WEB-INF/Verbal.html";
+		
+		s.setAttribute("studentTable", students);
+		s.setAttribute("verbal", newVerbal);
+		
+		response.sendRedirect(request.getContextPath() + "/GoToVerbalPage");
+		
+		//RequestDispatcher rd = request.getRequestDispatcher("/GoToVerbalPage");
+		//rd.forward(request, response);
+		
+		
+		/*String path = "/WEB-INF/Verbal.html";
 		JakartaServletWebApplication webApplication = JakartaServletWebApplication.buildApplication(getServletContext());
         WebContext ctx = new WebContext(webApplication.buildExchange(request, response), request.getLocale());
         ctx.setVariable("studentTable", students);
         ctx.setVariable("verbal", newVerbal);
 
-		templateEngine.process(path, ctx, response.getWriter());
+		templateEngine.process(path, ctx, response.getWriter());*/
 	}
 
 	/**

@@ -6,6 +6,7 @@ public class VerbalBean {
 	private String hour;
 	private int courseID;
 	private String examDate;
+	private String courseName;
 	
 	public void setID(int i) {
 		this.id = i;
@@ -27,6 +28,10 @@ public class VerbalBean {
 		this.examDate = d;
 	}
 	
+	public void setCourseName(String n) {
+		this.courseName = n;
+	}
+	
 	
 	public int getID() {
 		return this.id;
@@ -46,5 +51,9 @@ public class VerbalBean {
 	
 	public String getExamDate() {
 		return examDate;
+	}
+	
+	public String getCourseName() {
+		return courseName;
 	}
 }

@@ -183,4 +183,47 @@ public class StudentTableDAO {
 		}
 	}
 	
+	public List<RegisteredStudent> getStudentsFromVerbal(int verbalID) throws SQLException {
+		List<RegisteredStudent> students = new ArrayList<>();
+		String query = "SELECT \n"
+				+ "  u.matricola          AS matr,\n"
+				+ "  u.nome        AS nome,\n"
+				+ "  u.cognome     AS cognome,\n"
+				+ "  u.mail       AS email,\n"
+				+ "  ia.voto       AS voto\n"
+				+ "FROM Verbale v\n"
+				+ "  JOIN Studenti_Verbale sv\n"
+				+ "    ON v.id = sv.id_verbale\n"
+				+ "  JOIN Utente u\n"
+				+ "    ON sv.id_studente = u.id\n"
+				+ "  JOIN Iscrizioni_Appello ia\n"
+				+ "    ON ia.id_corso   = v.id_corso\n"
+				+ "   AND ia.data       = v.data\n"
+				+ "   AND ia.id_studente= u.id\n"
+				+ "WHERE v.id = ?\n"
+				+ "ORDER BY\n"
+				+ "  u.cognome ASC,\n"
+				+ "  u.nome    ASC\n"
+				+ ";\n"
+				+ "";
+		
+		try (PreparedStatement pstatement = con.prepareStatement(query);) {
+			pstatement.setInt(1, verbalID);
+			try (ResultSet result = pstatement.executeQuery()) {
+                while (result.next()) {
+                    RegisteredStudent stud = new RegisteredStudent();
+                    stud.setMatr(result.getString("matr"));
+                    stud.setSurname(result.getString("cognome"));
+                    stud.setName(result.getString("nome"));
+                    stud.setMail(result.getString("email"));
+                    stud.setGrade(result.getString("voto"));
+                    
+                    students.add(stud);
+                }
+            }
+		return students;
+		}
+		
+	}	
+	
 }

@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>Verbale</title>
+  <style>
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      margin-bottom: 2rem;
+    }
+    th, td {
+      border: 1px solid #666;
+      padding: 0.5rem;
+      text-align: left;
+    }
+    thead {
+      background-color: #f0f0f0;
+    }
+  </style>
+</head>
+<body>
+  <div align="right">
+		<a th:href="@{/Logout}">Logout</a>
+  </div>
+  
+  <h2>Elenco studenti inclusi nel corrente verbale: </h2>
+  
+  <table>
+    <thead>
+      <tr>
+  <th>
+                 Nome del corso
+  </th>
+  <th>
+                 Data dell'appello
+  </th>
+  <th>
+                 ID del verbale
+  </th>
+  <th>
+                 Data di creazione del verbale
+  </th>
+  <th>
+                 Ora di creazione del verbale
+  </th>
+</tr>
+    </thead>
+    <tbody th:remove="all-but-first">
+      <!-- 1) questo TR è il “template” dinamico -->
+      <tr th:each="verbal : ${verbalTable}">
+        <td th:text="${verbal.courseName}">[Corso]</td>
+        <td th:text="${verbal.examDate}">[Data esame]</td>
+        <td th:text="${verbal.id}">[ID verbale]</td>
+        <td th:text="${verbal.date}">[data verbale]</td>
+        <td th:text="${verbal.hour}">[ora verbale]</td>
+        <td>
+          <a th:href="@{/GetStudentsFromVerbal(verbalID=${verbal.id})}">
+            <button type="button" class="link">Modifica</button>
+          </a>
+       </td>
+      </tr>
+
+      <tr>
+        <td>Basi di dati</td>
+        <td>2000-01-01</td>
+        <td>1</td>
+        <td>1999-01-01</td>
+        <td>00:00:00</td>
+      </tr>
+
+    </tbody>
+  </table>
+ 
+  <div align="right">
+		<a th:href="@{/GoToHomeProfessor}">Torna alla Home</a>
+  </div>
+
+</body>
+</html>
