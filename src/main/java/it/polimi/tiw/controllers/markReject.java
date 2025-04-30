@@ -101,18 +101,18 @@ public class markReject extends HttpServlet {
 		}
 		int id_corso = (Integer) s.getAttribute("selectedCourseID");
 		String data = (String) s.getAttribute("selectedExamDate");
-		LocalDate date = LocalDate.parse(data);
+		//LocalDate date = LocalDate.parse(data);
 		int id = u.getId();
-		ExamDAO eDAO = new ExamDAO(connection, id, date, id_corso);
+		ExamDAO eDAO = new ExamDAO(connection, id, data, id_corso);
 		ExamResult examResult = null;
 		try {
-			eDAO.rejectMark(id_corso, date, id);
+			eDAO.rejectMark(id_corso, data, id);
 		} catch (SQLException e) {
 			//throw new ServletException(e);
  		}
 		
 		
-		response.sendRedirect(request.getContextPath() + "/SearchRound");
+		response.sendRedirect(request.getContextPath() + "/SearchRound?selectedExam=" + URLEncoder.encode(data, "UTF-8"));
 
 		
 	}

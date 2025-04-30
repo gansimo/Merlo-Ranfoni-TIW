@@ -49,6 +49,9 @@
 <body>
 
 <h1>Gestione Esame</h1>
+<div align="right">
+		<a th:href="@{/Logout}">Logout</a>
+</div>
 <h3>Appello: </h3>
 <span th:text="${nome_corso}">Cucica di Torte</span>
 <span th:text="${esame.date}">25/12/800</span>
@@ -63,7 +66,6 @@ Impossibile caricare informazioni Appello
 
 <div th:if="${esame.state == 'non inserito' or esame.state == 'inserito'}">
 	<h3>Voto non ancora definito.</h3>
-	<a th:href="@{/Logout}" class="btn">Logout</a>
 </div>
 
 <div th:if="${esame.state == 'pubblicato' or esame.state == 'rifiutato' or esame.state == 'verbalizzato'}">
@@ -75,10 +77,13 @@ Impossibile caricare informazioni Appello
 <form th:action="@{/Reject}" method="get">
   <button type="submit" class="btn2">Rifiuta Voto</button>
 </form>
-<a th:href="@{/Logout}" class="btn">Logout</a>
-</div>
 </div>
 
-</div> 
+</div>
+
+</div>
+<div align="left">
+		<a th:href="@{/GoToHomeStudent}">Torna a selezione appello</a>
+ </div>
 </body>
 </html>

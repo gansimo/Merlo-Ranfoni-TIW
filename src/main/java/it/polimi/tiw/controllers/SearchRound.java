@@ -82,7 +82,7 @@ public class SearchRound extends HttpServlet {
 		request.getSession().setAttribute("selectedExamDate", data);
 		LocalDate date = LocalDate.parse(data);
 		int id = u.getId();
-		ExamDAO eDAO = new ExamDAO(connection, id, date, id_corso);
+		ExamDAO eDAO = new ExamDAO(connection, id, data, id_corso);
 		ExamResult examResult = null;
 		try {
 			examResult = eDAO.findExamData();

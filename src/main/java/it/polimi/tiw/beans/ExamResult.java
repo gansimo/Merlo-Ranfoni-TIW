@@ -4,7 +4,7 @@ import java.time.LocalDate;
 
 public class ExamResult {
 	private int courseId;
-	private LocalDate date;
+	private String date;
 	private int studentId;
 	private String mark;
 	private String state;
@@ -13,7 +13,7 @@ public class ExamResult {
 		courseId = cid;
 	}
 	
-	public void setDate(LocalDate d) {
+	public void setDate(String d) {
 		date = d;
 	}
 	
@@ -33,7 +33,7 @@ public class ExamResult {
 		return courseId;
 	}
 	
-	public LocalDate getDate() {
+	public String getDate() {
 		return date;
 	}
 	

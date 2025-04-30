@@ -12,10 +12,10 @@ import it.polimi.tiw.beans.ExamResult;
 public class ExamDAO {
 	private Connection con;
     private int studentID;
-    private LocalDate date;
+    private String date;
     private int courseID;
     
-    public ExamDAO(Connection connection, int i, LocalDate date, int cid) {
+    public ExamDAO(Connection connection, int i, String date, int cid) {
         this.con = connection;
         this.studentID = i;
         this.date = date;
@@ -31,7 +31,7 @@ public class ExamDAO {
 
         try (PreparedStatement pstatement = con.prepareStatement(query)) {
             pstatement.setInt(3, this.studentID);
-            pstatement.setString(2, (this.date).toString());
+            pstatement.setString(2, (this.date));
             pstatement.setInt(1, courseID);
             
             
@@ -63,11 +63,11 @@ public class ExamDAO {
 		 return name;
 	}
     
-    public void rejectMark(int c, LocalDate d, int u) throws SQLException{
-    	String query = "UPDATE Iscrizioni_Appello SET stato='rifiutato' WHERE id_corso = ?, data = ?, id_studente = ? ;";
+    public void rejectMark(int c, String d, int u) throws SQLException{
+    	String query = "UPDATE Iscrizioni_Appello SET stato='rifiutato', voto='rimandato' WHERE id_corso = ? AND data = ? AND id_studente = ? ;";
     	try (PreparedStatement pstatement = con.prepareStatement(query)) {
 			 pstatement.setInt(1, c);
-			 pstatement.setString(2, (d).toString());
+			 pstatement.setString(2, (d));
 			 pstatement.setInt(3, u);
 			 int updated = pstatement.executeUpdate();
 			 if (updated == 0) {

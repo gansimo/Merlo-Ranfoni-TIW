@@ -55,13 +55,14 @@
   <span th:text="${session.user.name}">Giacomo</span>
   <span th:text="${session.user.surname}">Merlo</span>
 
-  <p>Puoi usare il form qui sotto per selezionare una data d'appello:</p>
+  
   
   <div th:if="${#lists.isEmpty(corsi)}">
-  	<p>Nessun corso disponibile</p>
+  	<h3>Nessun corso disponibile</h3>
   </div>
   
    <div th:if="${not #lists.isEmpty(corsi)}">
+   <p>Puoi usare il form qui sotto per selezionare una data d'appello:</p>
   <form th:action="@{/GoToHomeStudent}" method="POST">
   <fieldset>
     <legend>Seleziona un corso:</legend>
@@ -70,16 +71,16 @@
       <option value="" disabled selected>-- Seleziona un corso --</option>
       <option th:each="c : ${corsi}"
               th:value="${c.id}"
-              th:text="${'Corso ' + c.courseName + ' - Prof: ' + c.profName + ' ' + c.profSurname}">
+              th:text="${'Corso ' + c.courseName + ' - Prof: ' + c.profName + ' ' + c.profSurname}"
+              th:selected="${c.id == session.selectedCourseID}">
       </option>
     </select>
   </fieldset>
   
     <button type="submit">Mostra le date d'appello</button>
 	  </form>
-	 </div>
-
-<form th:action="@{/SearchRound}" method="GET">
+	  
+	  <form th:action="@{/SearchRound}" method="GET">
   <fieldset>
     <legend>Seleziona una data d'appello:</legend>
     <label for="selectedExam">Appello:</label>
@@ -94,6 +95,9 @@
 
   <button type="submit">Vai alla pagina dell'appello selezionato</button>
 </form>
+	  
+	 </div>
+
 
 
   <div align="left">
