@@ -1,6 +1,7 @@
 package it.polimi.tiw.controllers;
 
 import java.io.IOException;
+import java.net.URLEncoder;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -111,13 +112,8 @@ public class markReject extends HttpServlet {
  		}
 		
 		
-		String path = getServletContext().getContextPath();
-		String target = "/SearchRound";
-		path = path + target;
-		JakartaServletWebApplication webApplication = JakartaServletWebApplication.buildApplication(getServletContext());
-        WebContext ctx = new WebContext(webApplication.buildExchange(request, response), request.getLocale());
-        
-		templateEngine.process(path, ctx, response.getWriter());
+		response.sendRedirect(request.getContextPath() + "/SearchRound");
+
 		
 	}
 
