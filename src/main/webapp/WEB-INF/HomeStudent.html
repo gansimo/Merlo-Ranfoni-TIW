@@ -3,105 +3,62 @@
 <head>
   <meta charset="ISO-8859-1">
   <title>Student's home</title>
-  
-  <!--Blocco di logout-->
-  <style>
-  .btn {
-  	position: absolute;
-  	left: 0;
-  	bottom: 0;
-    display: inline-block;
-    padding: 0.5em 1em;
-    background-color: #007bff;
-    color: white;
-    text-decoration: none;
-    border-radius: 4px;
-    font-weight: bold;
-    border: none;
-  }
-
-  .btn:hover {
-    background-color: #0056b3;
-  }
-</style>
-
-<style>
-  .submit {
-  	position: absolute;
-  	left: 0;
-  	bottom: 0;
-    display: inline-block;
-    padding: 0.5em 1em;
-    background-color: #007bff;
-    color: white;
-    text-decoration: none;
-    border-radius: 4px;
-    font-weight: bold;
-    border: none;
-  }
-
-  .btn:hover {
-    background-color: #0056b3;
-  }
-</style>
-
-
 </head>
 
 <body>
   
   <h1>Home Page Studente</h1>
-  Felice di vederti 
-  <span th:text="${session.user.name}">Giacomo</span>
-  <span th:text="${session.user.surname}">Merlo</span>
-
-  
+  <h2> Felice di vederti <span th:text="${session.user.name}">Giacomo</span> <span th:text="${session.user.surname}">Merlo</span> </h2>
   
   <div th:if="${#lists.isEmpty(corsi)}">
   	<h3>Nessun corso disponibile</h3>
   </div>
   
-   <div th:if="${not #lists.isEmpty(corsi)}">
+ <div th:if="${not #lists.isEmpty(corsi)}">
    <p>Puoi usare il form qui sotto per selezionare una data d'appello:</p>
   <form th:action="@{/GoToHomeStudent}" method="POST">
-  <fieldset>
     <legend>Seleziona un corso:</legend>
     <label for="SelectedCourse">Corso:</label>
     <select name="SelectedCourse" id="SelectedCourse" required>
-      <option value="" disabled selected>-- Seleziona un corso --</option>
+      <option value=""
+              th:if="${selectedCourseID == null}"
+              disabled
+              selected>
+        	  -- Seleziona un corso --
+      </option>
       <option th:each="c : ${corsi}"
               th:value="${c.id}"
               th:text="${'Corso ' + c.courseName + ' - Prof: ' + c.profName + ' ' + c.profSurname}"
-              th:selected="${c.id == session.selectedCourseID}">
+              th:selected="${c.id == selectedCourseID}">
       </option>
     </select>
-  </fieldset>
   
     <button type="submit">Mostra le date d'appello</button>
-	  </form>
-	  
-	  <form th:action="@{/SearchRound}" method="GET">
-  <fieldset>
-    <legend>Seleziona una data d'appello:</legend>
-    <label for="selectedExam">Appello:</label>
-    <select name="selectedExam" id="selectedExam" required>
-      <option value="" disabled selected>-- Seleziona una data --</option>
-      <option th:each="a : ${appello}"
-              th:value="${a.date}"    
-              th:text="${#temporals.format(a.date, 'dd/MM/yyyy')}">
-      </option>
-    </select>
-  </fieldset>
+ </form>
+ </div>
+ 
+<div th:if="${not #lists.isEmpty(appelli)}">	  
+ <form th:action="@{/SearchRound}" method="GET">
+	<input type="hidden" name="selectedCourseID"
+       		   th:value="${selectedCourseID}" />
+  	<legend>Seleziona una data d'appello:</legend>
+  	<label for="selectedExam">Appello:</label>
+  	<select name="selectedExam" id="selectedExam" required>
+		<option th:each="a : ${appelli}"
+		        th:value="${a.date}"    
+		        th:text="${#temporals.format(a.date, 'dd/MM/yyyy')}">
+		</option>
+  	</select>
 
-  <button type="submit">Vai alla pagina dell'appello selezionato</button>
+ 	<button type="submit">Vai alla pagina dell'appello selezionato</button>
 </form>
 	  
-	 </div>
+</div>
 
 
 
   <div align="left">
-    <a th:href="@{/Logout}" class="btn">Logout</a>
+    <a th:href="@{/Logout}">Logout</a>
   </div>
 </body>
 </html>

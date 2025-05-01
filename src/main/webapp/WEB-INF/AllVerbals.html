@@ -24,7 +24,7 @@
 		<a th:href="@{/Logout}">Logout</a>
   </div>
   
-  <h2>Elenco studenti inclusi nel corrente verbale: </h2>
+  <h2>I tuoi verbali: </h2>
   
   <table>
     <thead>
@@ -55,7 +55,7 @@
         <td th:text="${verbal.date}">[data verbale]</td>
         <td th:text="${verbal.hour}">[ora verbale]</td>
         <td>
-          <a th:href="@{/GetStudentsFromVerbal(verbalID=${verbal.id})}">
+          <a th:href="@{/GoToVerbalPage(verbalID=${verbal.id}, isNew=false)}">
             <button type="button" class="link">Visualizza studenti</button>
           </a>
        </td>

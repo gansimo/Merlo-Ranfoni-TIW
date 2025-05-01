@@ -17,14 +17,25 @@ public class StudentTableDAO {
 		this.con = connection;
 	}
 	
-	public List<RegisteredStudent> getStudentTable(int courseID, String date) throws SQLException {
+	public List<RegisteredStudent> getStudentTable(int courseID, String date, int profID) throws SQLException {
 		List<RegisteredStudent> students = new ArrayList<>();
 		
-		String query = "SELECT u.id, u.matricola, u.cognome, u.nome, u.mail, u.corso_laurea, i.voto, i.stato FROM Iscrizioni_Appello AS i JOIN Utente AS u ON i.id_studente = u.id WHERE i.id_corso = ? AND i.data = ? ";
+		String query = "SELECT \n"
+				+ "u.id, u.matricola, u.cognome, u.nome, u.mail, u.corso_laurea, i.voto, i.stato \n"
+				+ "FROM \n"
+				+ "Iscrizioni_Appello AS i JOIN Utente AS u ON i.id_studente = u.id \n"
+				+ "WHERE \n"
+				+ "i.id_corso = ? AND i.data = ? AND \n"
+				+ "EXISTS(\n"
+				+ "		SELECT *\n"
+				+ "        FROM Corso as c\n"
+				+ "        WHERE c.id_prof = ? AND c.id = i.id_corso\n"
+				+ "        ) ";
 		
 		try (PreparedStatement pstatement = con.prepareStatement(query);) {
 			pstatement.setInt(1, courseID);
 			pstatement.setString(2, date);
+			pstatement.setInt(3, profID);
 			try (ResultSet result = pstatement.executeQuery()) {
                 while (result.next()) {
                     RegisteredStudent stud = new RegisteredStudent();
@@ -44,14 +55,23 @@ public class StudentTableDAO {
 		}
 	}
 	
-	public List<RegisteredStudent> getOrderedStudentTable(int courseID, String date, String orderByColumn, String orderByDirection) throws SQLException {
+	public List<RegisteredStudent> getOrderedStudentTable(int courseID, String date, String orderByColumn, String orderByDirection, int profID) throws SQLException {
 		List<RegisteredStudent> students = new ArrayList<>();
 		
-		String query = "SELECT u.id, u.matricola, u.cognome, u.nome, u.mail, u.corso_laurea, i.voto, i.stato FROM Iscrizioni_Appello AS i JOIN Utente AS u ON i.id_studente = u.id WHERE i.id_corso = ? AND i.data = ? ORDER BY " + orderByColumn + " " + orderByDirection;
+		String query = "SELECT u.id, u.matricola, u.cognome, u.nome, u.mail, u.corso_laurea, i.voto, i.stato \n"
+				+ "FROM Iscrizioni_Appello AS i JOIN Utente AS u ON i.id_studente = u.id \n"
+				+ "WHERE i.id_corso = ? AND i.data = ? AND \n"
+				+ "EXISTS( \n"
+				+ "		SELECT * \n"
+				+ "        FROM Corso as c \n"
+				+ "        WHERE c.id_prof = ? AND c.id = i.id_corso \n"
+				+ "        ) \n"
+				+ "ORDER BY " + orderByColumn + " " + orderByDirection;
 		
 		try (PreparedStatement pstatement = con.prepareStatement(query);) {
 			pstatement.setInt(1, courseID);
 			pstatement.setString(2, date);
+			pstatement.setInt(3, profID);
 			try (ResultSet result = pstatement.executeQuery()) {
                 while (result.next()) {
                     RegisteredStudent stud = new RegisteredStudent();
@@ -71,14 +91,22 @@ public class StudentTableDAO {
 		}
 	}
 	
-	public RegisteredStudent getRegisteredStudent(int courseID, String date, int studID) throws SQLException {
+	public RegisteredStudent getRegisteredStudent(int courseID, String date, int studID, int profID) throws SQLException {
 		RegisteredStudent stud;
-		String query = "SELECT u.matricola, u.cognome, u.nome, u.mail, u.corso_laurea, i.voto, i.stato FROM Iscrizioni_Appello AS i JOIN Utente AS u ON i.id_studente = u.id WHERE i.id_corso = ? AND i.data = ? AND i.id_studente = ?";
+		String query = "SELECT u.matricola, u.cognome, u.nome, u.mail, u.corso_laurea, i.voto, i.stato \n"
+				+ "FROM Iscrizioni_Appello AS i JOIN Utente AS u ON i.id_studente = u.id \n"
+				+ "WHERE i.id_corso = ? AND i.data = ? AND i.id_studente = ? AND \n "
+				+ "EXISTS(\n"
+				+ "		SELECT *\n"
+				+ "        FROM Corso as c\n"
+				+ "        WHERE c.id_prof = ? AND c.id = i.id_corso\n"
+				+ "        ) ";
 		
 		try (PreparedStatement pstatement = con.prepareStatement(query);) {
 			pstatement.setInt(1, courseID);
 			pstatement.setString(2, date);
 			pstatement.setInt(3, studID);
+			pstatement.setInt(4, profID);
 			try (ResultSet result = pstatement.executeQuery()) {
 				stud = new RegisteredStudent();
 				if(result.next()) {
@@ -96,8 +124,14 @@ public class StudentTableDAO {
 		}
 	}
 	
-	public void updateGrade(int courseID, String date, int studID, String grade, String state) throws SQLException {
-		String query = "UPDATE Iscrizioni_Appello SET voto = ?, stato = ? WHERE id_studente = ? AND id_corso = ? AND data = ?";
+	public void updateGrade(int courseID, String date, int studID, String grade, String state, int profID) throws SQLException {
+		String query = "UPDATE Iscrizioni_Appello SET voto = ?, stato = ? \n"
+				+ "WHERE id_studente = ? AND id_corso = ? AND data = ? AND \n"
+				+ "EXISTS( \n"
+				+ "		   SELECT * \n"
+				+ "        FROM Corso as c \n"
+				+ "        WHERE c.id_prof = ? AND c.id = id_corso \n"
+				+ "        ) ";
 		
 		try (PreparedStatement pstatement = con.prepareStatement(query);) {
 			pstatement.setString(1, grade);
@@ -105,6 +139,7 @@ public class StudentTableDAO {
 			pstatement.setInt(3, studID);
 			pstatement.setInt(4, courseID);
 			pstatement.setString(5, date);
+			pstatement.setInt(6, profID);
 			int updated = pstatement.executeUpdate();
 		    if (updated == 0) {
 		      throw new SQLException("Nessuna riga aggiornata");
@@ -112,28 +147,42 @@ public class StudentTableDAO {
 		}
 	}
 	
-	public void publishGrades(int courseID, String date) throws SQLException {
-		String query = "UPDATE Iscrizioni_Appello SET stato = ? WHERE id_corso = ? AND data = ? AND stato = 'inserito'";
+	public void publishGrades(int courseID, String date, int profID) throws SQLException {
+		String query = "UPDATE Iscrizioni_Appello SET stato = ? \n"
+				+ "WHERE id_corso = ? AND data = ? AND stato = 'inserito' AND \n"
+				+ "EXISTS( \n"
+				+ "		   SELECT * \n"
+				+ "        FROM Corso as c \n"
+				+ "        WHERE c.id_prof = ? AND c.id = id_corso \n"
+				+ "        ) ";
 		try (PreparedStatement pstatement = con.prepareStatement(query);) {
 			pstatement.setString(1, "pubblicato");
 			pstatement.setInt(2, courseID);
 			pstatement.setString(3, date);
+			pstatement.setInt(4, profID);
 			pstatement.executeUpdate();
 		}
 	}
 	
-	public int verbalizeGrades(int courseID, String date) throws SQLException {
-		String query = "UPDATE Iscrizioni_Appello SET stato = ? WHERE id_corso = ? AND data = ? AND (stato = 'pubblicato' OR stato = 'rifiutato')";
+	public int verbalizeGrades(int courseID, String date, int profID) throws SQLException {
+		String query = "UPDATE Iscrizioni_Appello SET stato = ? \n"
+				+ "WHERE id_corso = ? AND data = ? AND (stato = 'pubblicato' OR stato = 'rifiutato') AND \n"
+				+ "EXISTS( \n"
+				+ "		   SELECT * \n"
+				+ "        FROM Corso as c \n"
+				+ "        WHERE c.id_prof = ? AND c.id = id_corso \n"
+				+ "        ) ";
 		try (PreparedStatement pstatement = con.prepareStatement(query);) {
 			pstatement.setString(1, "verbalizzato");
 			pstatement.setInt(2, courseID);
 			pstatement.setString(3, date);
+			pstatement.setInt(4, profID);
 			
 			return pstatement.executeUpdate();
 		}
 	}
 	
-	public List<RegisteredStudent> getNewVerbalizedStudents(int courseID, String date) throws SQLException {
+	public List<RegisteredStudent> getNewVerbalizedStudents(int courseID, String date, int profID) throws SQLException {
 		List<RegisteredStudent> students = new ArrayList<>();
 		
 		String query = "SELECT \n"
@@ -152,18 +201,23 @@ public class StudentTableDAO {
 				+ "WHERE \n"
 				+ "    i.id_corso = ? \n"
 				+ "    AND i.data = ? \n"
-				+ "	AND i.stato = 'verbalizzato'\n"
+				+ "	   AND i.stato = 'verbalizzato'\n"
 				+ "    AND NOT EXISTS (\n"
 				+ "        SELECT *\n"
 				+ "        FROM Studenti_Verbale AS sv JOIN Verbale AS v\n"
 				+ "        WHERE sv.id_verbale  = v.id\n"
 				+ "          AND sv.id_studente = u.id\n"
-				+ "    );\n"
-				+ "";
+				+ "    ) \n"
+				+ "    AND EXISTS( \n"
+				+ "		   SELECT * \n"
+				+ "        FROM Corso as c \n"
+				+ "        WHERE c.id_prof = ? AND c.id = i.id_corso \n"
+				+ "        ) ";
 		
 		try (PreparedStatement pstatement = con.prepareStatement(query);) {
 			pstatement.setInt(1, courseID);
 			pstatement.setString(2, date);
+			pstatement.setInt(3, profID);
 			try (ResultSet result = pstatement.executeQuery()) {
                 while (result.next()) {
                     RegisteredStudent stud = new RegisteredStudent();

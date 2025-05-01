@@ -21,7 +21,7 @@
       <label for="scelta">Seleziona corso:</label>
       <select name="scelta" id="scelta" required>
         <option value=""
-              th:if="${session.selectedCourseID == null}"
+              th:if="${selectedCourseID == null}"
               disabled
               selected>
         	    Seleziona un corso
@@ -29,7 +29,7 @@
         <option th:each="course : ${availableCourses}"
                 th:value="${course.id}"
                 th:text="${course.courseName}"
-                th:selected="${course.id == session.selectedCourseID}">
+                th:selected="${course.id == selectedCourseID}">
         </option>
       </select>
       <button type="submit">Mostra le date d'appello</button>
@@ -42,6 +42,8 @@
   	</div>
   	<div th:if="${not #lists.isEmpty(availableDates)}">
   		<form th:action="@{/GoToStudentTable}" method="GET">
+  			<input type="hidden" name="selectedCourseID"
+         		   th:value="${selectedCourseID}" />
 		    <label for="date">Seleziona data d'appello:</label>
 		    <select name="date" id="date">
 		      <option th:each="app : ${availableDates}"

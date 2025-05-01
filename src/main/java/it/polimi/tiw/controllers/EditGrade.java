@@ -25,6 +25,8 @@ import org.thymeleaf.web.servlet.JakartaServletWebApplication;
 
 import it.polimi.tiw.beans.RegisteredStudent;
 import it.polimi.tiw.beans.UserBean;
+import it.polimi.tiw.daos.CourseDAO;
+import it.polimi.tiw.daos.ExamDAO;
 import it.polimi.tiw.daos.StudentTableDAO;
 
 /**
@@ -88,29 +90,65 @@ public class EditGrade extends HttpServlet {
 			}
 		}
 		
+		if(request.getParameter("selectedCourseID") == null || request.getParameter("date") == null) {
+			response.sendError(HttpServletResponse.SC_BAD_GATEWAY, "You have not selected a course or a date!");
+			return;
+		}
+		
+		if(request.getParameter("selectedStudID") == null) {
+			response.sendError(HttpServletResponse.SC_BAD_GATEWAY, "You have not selected a student!");
+			return;
+		}
+		
 		StudentTableDAO stDAO = new StudentTableDAO(connection);
 		RegisteredStudent stud = new RegisteredStudent();
-		int selectedCourseID = (Integer) s.getAttribute("selectedCourseID");
+		
 		String studentID = request.getParameter("selectedStudID");
 		int selectedStudentID = Integer.parseInt(studentID);
-		s.setAttribute("selectedStudID", selectedStudentID);
-		String stringDate = (String) s.getAttribute("selectedDate");
+		int selectedCourseID =  Integer.parseInt(request.getParameter("selectedCourseID"));
+		String selectedDate = request.getParameter("date");
 		
-		System.out.println(selectedCourseID + " " + selectedStudentID + " " + stringDate);
+		
+		System.out.println(selectedCourseID + " " + selectedStudentID + " " + selectedDate);
 
 		try {
-			stud = stDAO.getRegisteredStudent(selectedCourseID, stringDate, selectedStudentID);
+			stud = stDAO.getRegisteredStudent(selectedCourseID, selectedDate, selectedStudentID, u.getId());
 			System.out.println("ciao");
 		} catch (SQLException e) {
 			//throw new ServletException(e);
 			response.sendError(HttpServletResponse.SC_BAD_GATEWAY, "Failure in database finding student");
+			return;
+ 		}
+		
+		if(stud.getMatr() == null || stud.getMatr().isEmpty()) {
+			response.sendError(HttpServletResponse.SC_BAD_GATEWAY, "You cannot update the grade of this student!");
+			return;
+		}
+		
+		if(!(stud.getState().equals("inserito") || stud.getState().equals("non inserito"))) {
+			response.sendError(HttpServletResponse.SC_BAD_GATEWAY, "You have already updated the grade of this student!");
+			return;
+		}
+		
+		ExamDAO eDAO = new ExamDAO(connection);
+		String courseName = null;
+		
+		try {
+			courseName = eDAO.findExamName(selectedCourseID);
+		} catch (SQLException e) {
+			//throw new ServletException(e);
+			response.sendError(HttpServletResponse.SC_BAD_GATEWAY, "Failure in database finding student");
+			return;
  		}
 
 		String path = "/WEB-INF/Edit-Grade.html";
 		JakartaServletWebApplication webApplication = JakartaServletWebApplication.buildApplication(getServletContext());
         WebContext ctx = new WebContext(webApplication.buildExchange(request, response), request.getLocale());
         ctx.setVariable("selectedStudent", stud);
-        ctx.setVariable("examDate", stringDate);
+        ctx.setVariable("examDate", selectedDate);
+        ctx.setVariable("courseID", selectedCourseID);
+        ctx.setVariable("studID", selectedStudentID);
+        ctx.setVariable("courseName", courseName);
 
 		templateEngine.process(path, ctx, response.getWriter());
 	}
@@ -133,21 +171,48 @@ public class EditGrade extends HttpServlet {
 			}
 		}
 		
+		if(request.getParameter("selectedCourseID") == null || request.getParameter("date") == null) {
+			response.sendError(HttpServletResponse.SC_BAD_GATEWAY, "You have not selected a course or a date!");
+			return;
+		}
+		
+		if(request.getParameter("selectedStudentID") == null) {
+			response.sendError(HttpServletResponse.SC_BAD_GATEWAY, "You have not selected a student!");
+			return;
+		}
+		
+		if(request.getParameter("newGrade") == null) {
+			response.sendError(HttpServletResponse.SC_BAD_GATEWAY, "You have not selected a new grade!");
+			return;
+		}
+		
 		StudentTableDAO stDAO = new StudentTableDAO(connection);
-		int selectedCourseID = (Integer) s.getAttribute("selectedCourseID");
-		String stringDate = (String) s.getAttribute("selectedDate");
-		int selectedStudID = (Integer) s.getAttribute("selectedStudID");
+		
+		String studentID = request.getParameter("selectedStudentID");
+		int selectedStudID = Integer.parseInt(studentID);
+		int selectedCourseID =  Integer.parseInt(request.getParameter("selectedCourseID"));
+		String selectedDate = request.getParameter("date");
 		String grade = request.getParameter("newGrade");
+
+	    try {
+	        int value = Integer.parseInt(grade);
+	        if(value < 18 || value > 30) {
+	        	response.sendError(HttpServletResponse.SC_BAD_GATEWAY, "Error: invalid grade!");
+				return;
+	        }
+	    } catch (NumberFormatException e) {
+	        // check left to the query enumeration
+	    }
 		
 		try {
-			stDAO.updateGrade(selectedCourseID, stringDate, selectedStudID, grade, "inserito");
+			stDAO.updateGrade(selectedCourseID, selectedDate, selectedStudID, grade, "inserito", u.getId());
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			response.sendError(HttpServletResponse.SC_BAD_GATEWAY, "Error: cannot find any of your students with this parameters!");
+			return;
 		}
 		
 		
-		response.sendRedirect(request.getContextPath() + "/GoToStudentTable?date=" + URLEncoder.encode(stringDate, "UTF-8"));
+		response.sendRedirect(request.getContextPath() + "/GoToStudentTable?selectedCourseID=" + selectedCourseID + "&date=" + URLEncoder.encode(selectedDate, "UTF-8"));
 	}
 
 }

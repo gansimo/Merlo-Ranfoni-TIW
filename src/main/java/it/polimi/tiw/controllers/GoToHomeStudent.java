@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 
 import jakarta.servlet.ServletContext;
@@ -76,33 +77,27 @@ public class GoToHomeStudent extends HttpServlet {
 				return;
 			}
 		}
+		
+		
+		
 		System.out.println("Utente loggato ID = " + u.getId()); 
-		StudentDAO sDao = new StudentDAO(connection, u.getId());
+		StudentDAO sDAO = new StudentDAO(connection);
 		List<Course> courses = null;
+		
 		try {
-			courses = sDao.findStudentCourses();
+			courses = sDAO.findStudentCourses(u.getId());
 			System.out.println("CORSI TROVATI = " + courses.size());
 		} catch (SQLException e) {
 			//throw new ServletException(e);
-			response.sendError(HttpServletResponse.SC_BAD_GATEWAY, "Failure in database finding professor courses");
+			response.sendError(HttpServletResponse.SC_BAD_GATEWAY, "Failure in database finding student courses");
  		}
-		
-		int selectedCourseID = 0;
-		try {
-			 selectedCourseID = sDao.findFirstCourse();
-		} catch (SQLException e) {
-			//throw new ServletException(e);
-			response.sendError(HttpServletResponse.SC_BAD_GATEWAY, "Failure in database finding professor courses");
- 		}
-		
 		
 		
 		String path = "/WEB-INF/HomeStudent.html";
 		JakartaServletWebApplication webApplication = JakartaServletWebApplication.buildApplication(getServletContext());
         WebContext ctx = new WebContext(webApplication.buildExchange(request, response), request.getLocale());
-
 		ctx.setVariable("corsi", courses);
-		ctx.setVariable("SelectedCourse", selectedCourseID);
+		
 		templateEngine.process(path, ctx, response.getWriter());
 	}
 
@@ -130,30 +125,27 @@ public class GoToHomeStudent extends HttpServlet {
 		
 		
 		String selectedCourse = request.getParameter("SelectedCourse");
-		List<Exam> date_appello = null;
 		int selectedCourseID = Integer.parseInt(selectedCourse);
-		request.getSession().setAttribute("selectedCourseID", selectedCourseID);
-		CourseDAO pDao = new CourseDAO(connection, selectedCourseID);
-		try {date_appello = pDao.findExams();
-		} catch (SQLException e) {
-			// throw new ServletException(e);
-			response.sendError(HttpServletResponse.SC_BAD_GATEWAY, "Failure in user's project database extraction");
-		}
 		
 		
-		
-		StudentDAO sDao = new StudentDAO(connection, u.getId());
-		List<Course> courses = null;
+		StudentDAO sDAO = new StudentDAO(connection);
+		List<Course> courses = new ArrayList<Course>();
 		try {
-			courses = sDao.findStudentCourses();
-			System.out.println("CORSI TROVATI = " + courses.size());
+			courses = sDAO.findStudentCourses(u.getId());
 		} catch (SQLException e) {
 			//throw new ServletException(e);
-			response.sendError(HttpServletResponse.SC_BAD_GATEWAY, "Failure in database finding professor courses");
+			response.sendError(HttpServletResponse.SC_BAD_GATEWAY, "Failure in database finding student courses");
  		}
 		
+		CourseDAO cDAO = new CourseDAO(connection);
+		List<Exam> examDates = new ArrayList<Exam>();
 		
-		
+		try {
+			examDates = cDAO.findStudentExams(selectedCourseID, u.getId());
+		} catch (SQLException e) {
+			//throw new ServletException(e);
+			response.sendError(HttpServletResponse.SC_BAD_GATEWAY, "Failure in database finding selected exam's dates");
+ 		}
 		
 		String path = "/WEB-INF/HomeStudent.html";
 
@@ -161,8 +153,8 @@ public class GoToHomeStudent extends HttpServlet {
         WebContext ctx = new WebContext(webApplication.buildExchange(request, response), request.getLocale());
 
         ctx.setVariable("corsi", courses);
-		ctx.setVariable("projectid", selectedCourseID);
-		ctx.setVariable("appello", date_appello);
+		ctx.setVariable("selectedCourseID", selectedCourseID);
+		ctx.setVariable("appelli", examDates);
 		templateEngine.process(path, ctx, response.getWriter());
 		
 	}

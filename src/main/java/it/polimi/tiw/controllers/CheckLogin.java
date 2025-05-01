@@ -51,6 +51,7 @@ public class CheckLogin extends HttpServlet {
 			throws ServletException, IOException {
 		String mail = request.getParameter("mail");
 		String psw = request.getParameter("psw");
+		System.out.println(psw);
 		UserDAO usr = new UserDAO(connection);
 		UserBean u = null;
 		try {

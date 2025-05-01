@@ -83,19 +83,27 @@ public class PublishGrades extends HttpServlet {
 			}
 		}
 		
+		if(request.getParameter("selectedCourseID") == null || request.getParameter("date") == null) {
+			response.sendError(HttpServletResponse.SC_BAD_GATEWAY, "You have not selected a course or a date!");
+			return;
+		}
+		
 		StudentTableDAO stDAO = new StudentTableDAO(connection);
-		int selectedCourseID = (Integer) s.getAttribute("selectedCourseID");
-		String selectedDate = (String) s.getAttribute("selectedDate");
+		//int selectedCourseID = (Integer) s.getAttribute("selectedCourseID");
+		//String selectedDate = (String) s.getAttribute("selectedDate");
+		
+		int selectedCourseID =  Integer.parseInt(request.getParameter("selectedCourseID"));
+		String selectedDate = request.getParameter("date");
 		
 		try {
-			stDAO.publishGrades(selectedCourseID, selectedDate);
+			stDAO.publishGrades(selectedCourseID, selectedDate, u.getId());
 			System.out.println("ciao");
 		} catch (SQLException e) {
 			//throw new ServletException(e);
 			response.sendError(HttpServletResponse.SC_BAD_GATEWAY, "Failure in database publishing grades");
  		}
 		
-		response.sendRedirect(request.getContextPath() + "/GoToStudentTable?date=" + URLEncoder.encode(selectedDate, "UTF-8"));
+		response.sendRedirect(request.getContextPath() + "/GoToStudentTable?selectedCourseID=" + selectedCourseID + "&date=" + URLEncoder.encode(selectedDate, "UTF-8"));
 	}
 
 	/**

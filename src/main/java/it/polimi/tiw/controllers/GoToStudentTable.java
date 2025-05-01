@@ -25,6 +25,7 @@ import org.thymeleaf.web.servlet.JakartaServletWebApplication;
 
 import it.polimi.tiw.beans.RegisteredStudent;
 import it.polimi.tiw.beans.UserBean;
+import it.polimi.tiw.daos.ExamDAO;
 import it.polimi.tiw.daos.StudentTableDAO;
 
 /**
@@ -87,26 +88,48 @@ public class GoToStudentTable extends HttpServlet {
 			}
 		}
 		
+		
+		if(request.getParameter("selectedCourseID") == null || request.getParameter("date") == null) {
+			response.sendError(HttpServletResponse.SC_BAD_GATEWAY, "You have not selected a course or a date!");
+			return;
+		}
+		
+		
 		StudentTableDAO stDAO = new StudentTableDAO(connection);
 		List<RegisteredStudent> students = new ArrayList<>();
-		int selectedCourseID = (Integer) s.getAttribute("selectedCourseID");
+		
+		
+		int selectedCourseID =  Integer.parseInt(request.getParameter("selectedCourseID"));
 		String stringDate = request.getParameter("date");
-		s.setAttribute("selectedDate", stringDate);
-		s.setAttribute("lastOrderCol", null);
-        s.setAttribute("lastOrderDir", null);
+		//s.setAttribute("selectedDate", stringDate);
+		//s.setAttribute("lastOrderCol", null);
+        //s.setAttribute("lastOrderDir", null);
 
 		try {
-			students = stDAO.getStudentTable(selectedCourseID, stringDate);
+			students = stDAO.getStudentTable(selectedCourseID, stringDate, u.getId());
 			System.out.println("ciao");
 		} catch (SQLException e) {
 			//throw new ServletException(e);
 			response.sendError(HttpServletResponse.SC_BAD_GATEWAY, "Failure in database finding student table");
  		}
+		
+		ExamDAO eDAO = new ExamDAO(connection);
+		String courseName = null;
+		try {
+			courseName = eDAO.findExamName(selectedCourseID);
+		} catch (SQLException e) {
+			//throw new ServletException(e);
+			response.sendError(HttpServletResponse.SC_BAD_GATEWAY, "Failure in database finding student table");
+ 		}
+		
 
 		String path = "/WEB-INF/StudentTable.html";
 		JakartaServletWebApplication webApplication = JakartaServletWebApplication.buildApplication(getServletContext());
         WebContext ctx = new WebContext(webApplication.buildExchange(request, response), request.getLocale());
         ctx.setVariable("studentTable", students);
+        ctx.setVariable("courseID", selectedCourseID);
+        ctx.setVariable("date", stringDate);
+        ctx.setVariable("courseName", courseName);
 
 		templateEngine.process(path, ctx, response.getWriter());
 	}

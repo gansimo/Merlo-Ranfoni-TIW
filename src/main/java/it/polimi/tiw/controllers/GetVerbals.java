@@ -14,6 +14,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.List;
 
 import org.thymeleaf.TemplateEngine;
@@ -94,9 +95,10 @@ public class GetVerbals extends HttpServlet {
 			verbs = vDAO.getVerbals(u.getId());
 			System.out.println("ciao");
 		} catch (SQLException e) {
-			throw new ServletException(e);
-			//response.sendError(HttpServletResponse.SC_BAD_GATEWAY, "Failure in database finding verbals table");
+			//throw new ServletException(e);
+			response.sendError(HttpServletResponse.SC_BAD_GATEWAY, "Failure in database finding verbals table");
  		}
+	
 		
 		String path = "/WEB-INF/AllVerbals.html";
 		JakartaServletWebApplication webApplication = JakartaServletWebApplication.buildApplication(getServletContext());

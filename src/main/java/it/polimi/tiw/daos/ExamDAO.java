@@ -11,36 +11,30 @@ import it.polimi.tiw.beans.ExamResult;
 
 public class ExamDAO {
 	private Connection con;
-    private int studentID;
-    private String date;
-    private int courseID;
     
-    public ExamDAO(Connection connection, int i, String date, int cid) {
+    public ExamDAO(Connection connection) {
         this.con = connection;
-        this.studentID = i;
-        this.date = date;
-        this.courseID = cid;
     }
     
-    public ExamResult findExamData() throws SQLException {
+    public ExamResult findExamData(int courseID, String date, int studentID) throws SQLException {
         ExamResult examResult = new ExamResult();
-        String query = "SELECT id_corso, data, id_studente, voto, stato " +
-                       "FROM Iscrizioni_Appello " +
-                       "WHERE id_corso = ? AND data = ? AND id_studente = ? " +
+        String query = "SELECT voto, stato \n" +
+                       "FROM Iscrizioni_Appello \n" +
+                       "WHERE id_corso = ? AND data = ? AND id_studente = ? \n" +
                        ";";
 
         try (PreparedStatement pstatement = con.prepareStatement(query)) {
-            pstatement.setInt(3, this.studentID);
-            pstatement.setString(2, (this.date));
+            pstatement.setInt(3, studentID);
+            pstatement.setString(2, date);
             pstatement.setInt(1, courseID);
             
             
             
             try (ResultSet result = pstatement.executeQuery()) {
                 while (result.next()) {
-                    examResult.setCourseId(this.courseID);
-                    examResult.setDate(this.date);
-                    examResult.setStudentId(this.studentID);
+                    examResult.setCourseId(courseID);
+                    examResult.setDate(date);
+                    examResult.setStudentId(studentID);
                     examResult.setMark(result.getString("voto"));
                     examResult.setState(result.getString("stato"));
                 	}

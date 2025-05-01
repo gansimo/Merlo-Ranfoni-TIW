@@ -13,22 +13,21 @@ public class StudentDAO {
     private Connection con;
     private int studentID;
 
-    public StudentDAO(Connection connection, int i) {
+    public StudentDAO(Connection connection) {
         this.con = connection;
-        this.studentID = i;
     }
 
-    public List<Course> findStudentCourses() throws SQLException {
+    public List<Course> findStudentCourses(int studID) throws SQLException {
         List<Course> courses = new ArrayList<>();
-        String query = "SELECT c.id, c.nome, u.nome AS prof_nome, u.cognome AS prof_cognome " +
-                       "FROM Corso AS c " +
-                       "JOIN Iscrizioni_corsi AS ic ON ic.id_corso = c.id " +
-                       "JOIN Utente AS u ON c.id_prof = u.id " +
-                       "WHERE ic.id_studente = ? " +
+        String query = "SELECT c.id, c.nome, u.nome AS prof_nome, u.cognome AS prof_cognome \n" +
+                       "FROM Corso AS c \n" +
+                       "JOIN Iscrizioni_corsi AS ic ON ic.id_corso = c.id \n" +
+                       "JOIN Utente AS u ON c.id_prof = u.id \n" +
+                       "WHERE ic.id_studente = ? \n" +
                        "ORDER BY c.nome ASC;";
 
         try (PreparedStatement pstatement = con.prepareStatement(query)) {
-            pstatement.setInt(1, this.studentID);
+            pstatement.setInt(1, studID);
             try (ResultSet result = pstatement.executeQuery()) {
                 while (result.next()) {
                     Course course = new Course();
@@ -41,19 +40,5 @@ public class StudentDAO {
             }
         }
         return courses;
-    }
-
-    public int findFirstCourse() throws SQLException {
-        String query = "SELECT id_corso FROM Iscrizioni_corsi WHERE id_studente = ? ORDER BY id_corso ASC LIMIT 1";
-        int r = 0;
-        try (PreparedStatement pstatement = con.prepareStatement(query)) {
-            pstatement.setInt(1, this.studentID);
-            try (ResultSet result = pstatement.executeQuery()) {
-                if (result.next()) {
-                    r = result.getInt("id_corso");
-                }
-            }
-        }
-        return r;
     }
 }

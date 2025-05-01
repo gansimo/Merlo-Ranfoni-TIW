@@ -89,42 +89,65 @@ public class Verbal extends HttpServlet {
 			}
 		}
 		
+		if(request.getParameter("selectedCourseID") == null || request.getParameter("date") == null) {
+			response.sendError(HttpServletResponse.SC_BAD_GATEWAY, "You have not selected a course or a date!");
+			return;
+		}
+		
 		StudentTableDAO stDAO = new StudentTableDAO(connection);
-		int selectedCourseID = (Integer) s.getAttribute("selectedCourseID");
-		String selectedDate = (String) s.getAttribute("selectedDate");
+		
+		//if(s.getAttribute("selectedCourseID") == null || s.getAttribute("selectedDate") == null) {
+		//	response.sendError(HttpServletResponse.SC_BAD_GATEWAY, "You have not selected a course!");
+		//	return;
+		//}
+		
+		//int selectedCourseID = (Integer) s.getAttribute("selectedCourseID");
+		//String selectedDate = (String) s.getAttribute("selectedDate");
 		List<RegisteredStudent> students = new ArrayList<>();
 		
+		int selectedCourseID =  Integer.parseInt(request.getParameter("selectedCourseID"));
+		String selectedDate = request.getParameter("date");
+		
 		try {
-			students = stDAO.getNewVerbalizedStudents(selectedCourseID, selectedDate);
+			students = stDAO.getNewVerbalizedStudents(selectedCourseID, selectedDate, u.getId());
 			System.out.println("ciao");
 		} catch (SQLException e) {
 			//throw new ServletException(e);
 			response.sendError(HttpServletResponse.SC_BAD_GATEWAY, "Failure in database finding student table");
+			return;
  		}
+		
+		if(students.isEmpty()) {		//the last query works only if the current logged user is trying to verbalize HIS students. If he forces wrong parameters, the query returns an empty list.
+			response.sendError(HttpServletResponse.SC_BAD_GATEWAY, "Error: you are trying to create an empty verbal");
+			return;		//returning i ensure that if this check is passed, the other queries are automatically authorized
+		}
 		
 		VerbalDAO vDAO = new VerbalDAO(connection);
 		VerbalBean newVerbal = new VerbalBean();
+		
 		try {
 			newVerbal = vDAO.createVerbal(selectedCourseID, selectedDate);
 			System.out.println("ciao");
 		} catch (SQLException e) {
-			throw new ServletException(e);
-			//response.sendError(HttpServletResponse.SC_BAD_GATEWAY, "Failure in database finding student table");
+			//throw new ServletException(e);
+			response.sendError(HttpServletResponse.SC_BAD_GATEWAY, "Failure in database creating a new verbal");
+			return;
  		}
 		
 		try {
 			vDAO.insertNewVerbalizedStudents(students, newVerbal);
 			System.out.println("ciao");
 		} catch (SQLException e) {
-			throw new ServletException(e);
-			//response.sendError(HttpServletResponse.SC_BAD_GATEWAY, "Failure in database finding student table");
+			//throw new ServletException(e);
+			response.sendError(HttpServletResponse.SC_BAD_GATEWAY, "Failure in database adding students to the new verbal");
+			return;
  		}
 		
+		//s.removeAttribute("selectedDate");
+		//s.setAttribute("studentTable", students);
+		//s.setAttribute("verbal", newVerbal);
 		
-		s.setAttribute("studentTable", students);
-		s.setAttribute("verbal", newVerbal);
-		
-		response.sendRedirect(request.getContextPath() + "/GoToVerbalPage");
+		response.sendRedirect(request.getContextPath() + "/GoToVerbalPage?verbalID=" + newVerbal.getID() + "&isNew=true");
 		
 		//RequestDispatcher rd = request.getRequestDispatcher("/GoToVerbalPage");
 		//rd.forward(request, response);

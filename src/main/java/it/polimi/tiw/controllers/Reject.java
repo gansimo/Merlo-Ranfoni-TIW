@@ -29,12 +29,12 @@ import it.polimi.tiw.daos.*;
 
 
 @WebServlet("/Reject")
-public class markReject extends HttpServlet {
+public class Reject extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	private Connection connection = null;
 	private TemplateEngine templateEngine;
 
-	public markReject() {
+	public Reject() {
 		super();
 		// TODO Auto-generated constructor stub
 	}
@@ -77,9 +77,21 @@ public class markReject extends HttpServlet {
 				return;
 			}
 		}
+		
+		if(request.getParameter("selectedCourseID") == null || request.getParameter("selectedExam") == null) {
+			response.sendError(HttpServletResponse.SC_BAD_GATEWAY, "Error: you have not selected a course ID or an exam date!");
+			return;
+		}
+		
+		int selectedCourseID = Integer.parseInt(request.getParameter("selectedCourseID"));
+		String date = request.getParameter("selectedExam");
+		
+		
 		String path = "/WEB-INF/StudentRejectMarkPage.html";
 		JakartaServletWebApplication webApplication = JakartaServletWebApplication.buildApplication(getServletContext());
         WebContext ctx = new WebContext(webApplication.buildExchange(request, response), request.getLocale());
+        ctx.setVariable("selectedCourseID", selectedCourseID);
+        ctx.setVariable("selectedExam", date);
         
 		templateEngine.process(path, ctx, response.getWriter());
 	}
@@ -99,20 +111,26 @@ public class markReject extends HttpServlet {
 				return;
 			}
 		}
-		int id_corso = (Integer) s.getAttribute("selectedCourseID");
-		String data = (String) s.getAttribute("selectedExamDate");
-		//LocalDate date = LocalDate.parse(data);
-		int id = u.getId();
-		ExamDAO eDAO = new ExamDAO(connection, id, data, id_corso);
-		ExamResult examResult = null;
+		
+		if(request.getParameter("selectedCourseID") == null || request.getParameter("selectedExam") == null) {
+			response.sendError(HttpServletResponse.SC_BAD_GATEWAY, "Error: you have not selected a course ID or an exam date!");
+			return;
+		}
+		
+		int selectedCourseID = Integer.parseInt(request.getParameter("selectedCourseID"));
+		String date = request.getParameter("selectedExam");
+
+		ExamDAO eDAO = new ExamDAO(connection);
+		
 		try {
-			eDAO.rejectMark(id_corso, data, id);
+			eDAO.rejectMark(selectedCourseID, date, u.getId());
 		} catch (SQLException e) {
 			//throw new ServletException(e);
+			response.sendError(HttpServletResponse.SC_BAD_GATEWAY, "Failure in database rejecting the mark");
  		}
 		
 		
-		response.sendRedirect(request.getContextPath() + "/SearchRound?selectedExam=" + URLEncoder.encode(data, "UTF-8"));
+		response.sendRedirect(request.getContextPath() + "/SearchRound?selectedCourseID="+ selectedCourseID + "&selectedExam=" + URLEncoder.encode(date, "UTF-8"));
 
 		
 	}

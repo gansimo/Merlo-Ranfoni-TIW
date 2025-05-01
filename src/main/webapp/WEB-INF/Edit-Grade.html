@@ -5,11 +5,17 @@
   <title>Modifica Voto Studente</title>
 </head>
 <body>
-  <h2 th:text="'Modifica voto per ' 
-      + ${selectedStudent.name} + ' ' + ${selectedStudent.surname}">Modifica voto</h2>
+  <h2 th:text="'Modifica voto per lo studente ' 
+      + ${selectedStudent.name} + ' ' + ${selectedStudent.surname} + ' relativo all`appello di ' + ${courseName} + ' in data ' + ${examDate}">Modifica voto</h2>
 	
 	<div th:if="${selectedStudent.state == 'inserito' or selectedStudent.state == 'non inserito'}">
 	  <form th:action="@{/EditGrade}" method="post">
+	  	<input type="hidden" name="selectedStudentID"
+         		   th:value="${studID}" />
+        <input type="hidden" name="selectedCourseID"
+         		   th:value="${courseID}" />
+        <input type="hidden" name="date"
+         		   th:value="${examDate}" /> 		   
 	    <p>Matricola: <span th:text="${selectedStudent.matr}"/></p>
 	    <p>Email:     <span th:text="${selectedStudent.mail}"/></p>
 	    <p>Corso di laurea: <span th:text="${selectedStudent.course}"/></p>
@@ -41,7 +47,7 @@
 	  </form>
 	  </div>
 	  <div align="right">
-		<a th:href="@{/GoToStudentTable(date=${examDate})}">Annulla</a>
+		<a th:href="@{/GoToStudentTable(selectedCourseID=${courseID}, date=${examDate})}">Annulla</a>
   </div>
 </body>
 </html>

@@ -12,6 +12,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.List;
 
 import jakarta.servlet.http.HttpSession;
@@ -84,6 +85,7 @@ public class GoToHomeProfessor extends HttpServlet {
 			}
 		}
 		
+		
 		ProfessorDAO pDAO = new ProfessorDAO(connection);
 		List<Course> courses = new ArrayList<>();
 		try {
@@ -120,18 +122,20 @@ public class GoToHomeProfessor extends HttpServlet {
 				return;
 			}
 		}
+		
 		int selectedCourseID = Integer.parseInt(request.getParameter("scelta"));
-		request.getSession().setAttribute("selectedCourseID", selectedCourseID);
-		CourseDAO cDAO = new CourseDAO(connection, selectedCourseID);
+
+		CourseDAO cDAO = new CourseDAO(connection);
 		List<Exam> exams = new ArrayList<>();
 		
 		try {
-			exams = cDAO.findExams();
+			exams = cDAO.findExams(selectedCourseID, u.getId());
 			System.out.println("ciao");
 		} catch (SQLException e) {
 			//throw new ServletException(e);
 			response.sendError(HttpServletResponse.SC_BAD_GATEWAY, "Failure in database finding professor courses");
  		}
+		
 		
 		ProfessorDAO pDAO = new ProfessorDAO(connection);
 		List<Course> courses = new ArrayList<>();
@@ -148,6 +152,7 @@ public class GoToHomeProfessor extends HttpServlet {
         WebContext ctx = new WebContext(webApplication.buildExchange(request, response), request.getLocale());
         ctx.setVariable("availableDates", exams);
         ctx.setVariable("availableCourses", courses);
+        ctx.setVariable("selectedCourseID", selectedCourseID);
 
 		templateEngine.process(path, ctx, response.getWriter());
 		

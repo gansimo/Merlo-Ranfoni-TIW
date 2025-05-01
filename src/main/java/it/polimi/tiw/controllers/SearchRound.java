@@ -76,23 +76,34 @@ public class SearchRound extends HttpServlet {
 				return;
 			}
 		}
-		int id_corso = (Integer) s.getAttribute("selectedCourseID");
-		System.out.println(id_corso);
+		
+		if(request.getParameter("selectedCourseID") == null || request.getParameter("selectedExam") == null) {
+			response.sendError(HttpServletResponse.SC_BAD_GATEWAY, "Error: you have not selected a course ID or an exam date!");
+			return;
+		}
+		
+		int selectedCourseID = Integer.parseInt(request.getParameter("selectedCourseID"));
 		String data = request.getParameter("selectedExam");
-		request.getSession().setAttribute("selectedExamDate", data);
-		LocalDate date = LocalDate.parse(data);
-		int id = u.getId();
-		ExamDAO eDAO = new ExamDAO(connection, id, data, id_corso);
+		
+		ExamDAO eDAO = new ExamDAO(connection);
 		ExamResult examResult = null;
+		
 		try {
-			examResult = eDAO.findExamData();
+			examResult = eDAO.findExamData(selectedCourseID, data, u.getId());
 		} catch (SQLException e) {
 			//throw new ServletException(e);
-			examResult = null;
+			response.sendError(HttpServletResponse.SC_BAD_GATEWAY, "Failure in database finding exam result");
  		}
+		
+		if(examResult.getMark() == null) {
+			response.sendError(HttpServletResponse.SC_BAD_GATEWAY, "Error: you are not subscribed to that exam!");
+			return;
+		}
+		
 		String courseName = null;
+		
 		try {
-			courseName = eDAO.findExamName(id_corso);
+			courseName = eDAO.findExamName(selectedCourseID);
 		} catch (SQLException e) {
 			//throw new ServletException(e);
 			response.sendError(HttpServletResponse.SC_BAD_GATEWAY, "Failure in database finding courseName");
@@ -101,9 +112,12 @@ public class SearchRound extends HttpServlet {
 		String path = "/WEB-INF/StudentExamPage.html";
 		JakartaServletWebApplication webApplication = JakartaServletWebApplication.buildApplication(getServletContext());
         WebContext ctx = new WebContext(webApplication.buildExchange(request, response), request.getLocale());
-
         ctx.setVariable("nome_corso", courseName);
 		ctx.setVariable("esame", examResult);
+		ctx.setVariable("selectedCourseID", selectedCourseID);
+		ctx.setVariable("selectedExam", data);
+		
+		
 		templateEngine.process(path, ctx, response.getWriter());
 	}
 

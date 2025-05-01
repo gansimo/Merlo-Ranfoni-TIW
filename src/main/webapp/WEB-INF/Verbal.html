@@ -20,13 +20,12 @@
   </style>
 </head>
 <body>
-  <h2 th:if="${session.selectedCourseID != null}">Nuovo verbale creato con successo</h2>
-  <h2 th:if="${session.selectedCourseID == null}">Dati del verbale richiesto:</h2>
-        <div>Data di creazione del verbale: </div><div th:text="${session.verbal.date}">2000-01-01</div>
-        <div>Codice identificativo del verbale: </div><div th:text="${session.verbal.id}">0</div>
-        <div>Orario di creazione del verbale: </div><div th:text="${session.verbal.hour}">00:00:00</div>
-        <div>Nome del corso: </div><div th:if="${session.selectedCourseID != null}" th:text="${session.selectedCourseID}">0</div>   <div th:if="${session.selectedCourseID == null}" th:text="${session.verbal.courseID}">0</div>
-        <div>Data d'appello del corso: </div><div th:if="${session.selectedCourseID != null}"  th:text="${session.selectedDate}">2000-01-01</div>   <div th:if="${session.selectedCourseID == null}"  th:text="${session.verbal.examDate}">2000-01-01</div>
+  <h2 th:if="${isNew == 'true'}">Nuovo verbale creato con successo</h2>
+  <h2 th:if="${isNew == 'false'}">Dati del verbale richiesto:</h2>
+        <div>Codice identificativo del verbale: </div><div th:text="${verbal.id}">0</div>
+        <div>Data e ora di creazione del verbale: </div><div th:text="${verbal.hour}">2000-01-01 00:00:00</div>
+        <div>Nome del corso: </div><div th:text="${verbal.courseName}">0</div>
+        <div>Data d'appello del corso: </div><div th:text="${verbal.examDate}">2000-01-01</div>
   
   <div align="right">
 		<a th:href="@{/Logout}">Logout</a>
@@ -56,7 +55,7 @@
     </thead>
     <tbody th:remove="all-but-first">
       <!-- 1) questo TR è il “template” dinamico -->
-      <tr th:each="student : ${session.studentTable}">
+      <tr th:each="student : ${studentTable}">
         <td th:text="${student.matr}">[matricola]</td>
         <td th:text="${student.surname}">[cognome]</td>
         <td th:text="${student.name}">[nome]</td>

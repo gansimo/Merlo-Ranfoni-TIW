@@ -108,27 +108,30 @@ private Connection con;
 		return verbals;
 	}
 	
-	public VerbalBean getVerbal(int verbalID) throws SQLException {
+	public VerbalBean getVerbal(int verbalID, int profID) throws SQLException {
 		VerbalBean verb = new VerbalBean();
 		String query = "SELECT\r\n"
-				+ "    id,\r\n"
-				+ "    data_verbale,\r\n"
-				+ "    ora_verbale,\r\n"
-				+ "    id_corso,\r\n"
-				+ "    data\r\n"
-				+ "FROM Verbale\r\n"
-				+ "WHERE id = ?\r\n"
-				+ ";\r\n"
-				+ "";
+				+ "    v.id,\r\n"
+				+ "    v.data_verbale,\r\n"
+				+ "    v.ora_verbale,\r\n"
+				+ "    v.id_corso,\r\n"
+				+ "    v.data,\r\n"
+				+ "	   co.nome \r\n"
+				+ "FROM Verbale AS v JOIN Corso AS co on v.id_corso = co.id \r\n"
+				+ "WHERE v.id = ? AND co.id_prof = ? \r\n";
+
+				
 		try (PreparedStatement pstatement = con.prepareStatement(query);) {
 			pstatement.setInt(1, verbalID);
+			pstatement.setInt(2, profID);
 			try (ResultSet result = pstatement.executeQuery()) {
                 while (result.next()) {
-                	verb.setCourseID(result.getInt("id_corso"));
-                	verb.setDate(result.getDate("data_verbale").toString());
-                	verb.setExamDate(result.getDate("data").toString());
-                	verb.setHour(result.getTimestamp("ora_verbale").toString());
-                	verb.setID(result.getInt("id"));
+                	verb.setCourseID(result.getInt("v.id_corso"));
+                	verb.setDate(result.getDate("v.data_verbale").toString());
+                	verb.setExamDate(result.getDate("v.data").toString());
+                	verb.setHour(result.getTimestamp("v.ora_verbale").toString());
+                	verb.setID(result.getInt("v.id"));
+                	verb.setCourseName(result.getString("co.nome"));
                 }
 			}
 		}

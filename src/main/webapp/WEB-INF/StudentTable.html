@@ -20,17 +20,20 @@
   </style>
 </head>
 <body>
-  <h2>Elenco Studenti Iscritti</h2>
+  <h2 th:if="${not #lists.isEmpty(studentTable)}">Elenco Studenti Iscritti all'appello del <span th:text="${date}">2000-01-01</span> del corso <span th:text="${courseName}">TIW</span></h2>
+  <h2 th:if="${#lists.isEmpty(studentTable)}">Non ci sono studenti iscritti all'appello richiesto!</h2>
   <div align="right">
 		<a th:href="@{/Logout}">Logout</a>
   </div>
+  
+  <div th:if="${not #lists.isEmpty(studentTable)}">
   <table>
     <thead>
       <tr th:with="
       col=${session.lastOrderCol},
       dir=${session.lastOrderDir}">
   <th>
-    <a th:href="@{/OrderStudentTable(column='u.matricola')}"
+    <a th:href="@{/OrderStudentTable(selectedCourseID=${courseID}, date=${date}, column='u.matricola')}"
        th:text="${col == 'u.matricola'} 
                  ? 'Matricola ' + (${dir == 'ASC'} ? '▲' : '▼') 
                  : 'Matricola'">
@@ -38,7 +41,7 @@
     </a>
   </th>
   <th>
-    <a th:href="@{/OrderStudentTable(column='u.cognome')}"
+    <a th:href="@{/OrderStudentTable(selectedCourseID=${courseID}, date=${date}, column='u.cognome')}"
        th:text="${col == 'u.cognome'} 
                  ? 'Cognome ' + (${dir == 'ASC'} ? '▲' : '▼')  
                  : 'Cognome'">
@@ -46,7 +49,7 @@
     </a>
   </th>
   <th>
-    <a th:href="@{/OrderStudentTable(column='u.nome')}"
+    <a th:href="@{/OrderStudentTable(selectedCourseID=${courseID}, date=${date}, column='u.nome')}"
        th:text="${col == 'u.nome'} 
                  ? 'Nome ' + (${dir == 'ASC'} ? '▲' : '▼')  
                  : 'Nome'">
@@ -54,7 +57,7 @@
     </a>
   </th>
   <th>
-    <a th:href="@{/OrderStudentTable(column='u.mail')}"
+    <a th:href="@{/OrderStudentTable(selectedCourseID=${courseID}, date=${date}, column='u.mail')}"
        th:text="${col == 'u.mail'} 
                  ? 'Email ' + (${dir == 'ASC'} ? '▲' : '▼')  
                  : 'Email'">
@@ -62,7 +65,7 @@
     </a>
   </th>
   <th>
-    <a th:href="@{/OrderStudentTable(column='u.corso_laurea')}"
+    <a th:href="@{/OrderStudentTable(selectedCourseID=${courseID}, date=${date}, column='u.corso_laurea')}"
        th:text="${col == 'u.corso_laurea'} 
                  ? 'Corso di laurea ' + (${dir == 'ASC'} ? '▲' : '▼')  
                  : 'Corso di laurea'">
@@ -70,7 +73,7 @@
     </a>
   </th>
   <th>
-    <a th:href="@{/OrderStudentTable(column='i.voto')}"
+    <a th:href="@{/OrderStudentTable(selectedCourseID=${courseID}, date=${date}, column='i.voto')}"
        th:text="${col == 'i.voto'} 
                  ? 'Voto ' + (${dir == 'ASC'} ? '▲' : '▼')  
                  : 'Voto'">
@@ -78,7 +81,7 @@
     </a>
   </th>
   <th>
-    <a th:href="@{/OrderStudentTable(column='i.stato')}"
+    <a th:href="@{/OrderStudentTable(selectedCourseID=${courseID}, date=${date}, column='i.stato')}"
        th:text="${col == 'i.stato'} 
                  ? 'Stato valutazione ' + (${dir == 'ASC'} ? '▲' : '▼')  
                  : 'Stato valutazione'">
@@ -99,7 +102,7 @@
         <td th:text="${student.state}">[stato]</td>
         <td>
           <a th:if="${student.state == 'inserito' or student.state == 'non inserito'}"
-             th:href="@{/EditGrade(selectedStudID=${student.id})}">
+             th:href="@{/EditGrade(selectedStudID=${student.id}, selectedCourseID=${courseID}, date=${date})}">
             <button type="button" class="link">Modifica</button>
           </a>
        </td>
@@ -136,11 +139,13 @@
   </table>
   
   <div align="left">
-		<a th:href="@{/PublishGrades}">Pubblica i voti inseriti</a>
+		<a th:href="@{/PublishGrades(selectedCourseID=${courseID}, date=${date})}">Pubblica i voti inseriti</a>
   </div>
   
   <div align="left">
-		<a th:href="@{/VerbalizeGrades}">Verbalizza i voti pubblicati</a>
+		<a th:href="@{/VerbalizeGrades(selectedCourseID=${courseID}, date=${date})}">Verbalizza i voti pubblicati</a>
+  </div>
+  
   </div>
   
   <div align="right">
