@@ -1,0 +1,99 @@
+/* Stili per le tabelle */
+.table-container {
+  width: 100%;
+  overflow-x: auto;
+  margin-bottom: 2rem;
+}
+
+table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  margin: 1.5rem 0;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: var(--shadow);
+  min-width: 1000px; 
+}
+
+th, td {
+  padding: 0.8rem 1rem;
+  text-align: left;
+  border-bottom: 1px solid var(--light-gray);
+}
+
+th {
+  background: linear-gradient(to right, var(--primary-color), #2980b9);
+  color: #fff;
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 0.85rem;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+}
+
+th a {
+  color: #fff;
+  text-decoration: none;
+  display: block;
+  width: 100%;
+}
+
+th a:hover {
+  color: var(--light-gray);
+}
+
+tbody tr {
+  transition: var(--transition);
+}
+
+tbody tr:nth-child(even) {
+  background: rgba(236, 240, 241, 0.5);
+}
+
+tbody tr:hover {
+  background-color: rgba(52, 152, 219, 0.05);
+}
+
+/* Status styling */
+td:nth-child(7) {
+  font-weight: 500;
+}
+
+td:nth-child(7):contains("verbalizzato") {
+  color: #27ae60;
+}
+
+td:nth-child(7):contains("pubblicato") {
+  color: #2980b9;
+}
+
+td:nth-child(7):contains("rimandato") {
+  color: #f39c12;
+}
+
+td:nth-child(7):contains("non inserito") {
+  color: #e74c3c;
+}
+
+/* Empty cell styling */
+td:empty::before {
+  content: "<vuoto>";
+  color: #95a5a6;
+  font-style: italic;
+}
+
+/* Table caption */
+table caption {
+  margin-bottom: 0.75rem;
+  font-weight: 600;
+  color: var(--primary-dark);
+}
+
+/* Empty state */
+.table-empty {
+  text-align: center;
+  padding: 2rem;
+  color: var(--secondary-color);
+  font-style: italic;
+}

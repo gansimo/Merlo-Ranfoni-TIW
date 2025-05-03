@@ -1,40 +1,62 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-  <meta charset="ISO-8859-1">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Gestione Esame</title>
+  <link rel="stylesheet" type="text/css" media="all" href="./css/base.css" th:href="@{/css/base.css}"/>
+  <link rel="stylesheet" type="text/css" media="all" href="./css/layout.css" th:href="@{/css/layout.css}" />
+  <link rel="stylesheet" type="text/css" media="all" href="./css/form.css" th:href="@{/css/form.css}" />
+  <link rel="stylesheet" type="text/css" media="all" href="./css/table.css" th:href="@{/css/table.css}" />
+  <link rel="stylesheet" type="text/css" media="all" href="./css/button.css" th:href="@{/css/button.css}" />
+  <link rel="stylesheet" type="text/css" media="all" href="./css/verbal.css" th:href="@{/css/verbal.css}" />
 </head>
-
 <body>
-
-<h1>Gestione Esame</h1>
-<div align="right">
-		<a th:href="@{/Logout}">Logout</a>
-</div>
-<h3>Appello: </h3>
-<span th:text="${nome_corso}">TIW</span> del 
-<span th:text="${esame.date}">2000-01-01</span>
-
-
-<div th:if="${esame.state == 'non inserito' or esame.state == 'inserito'}">
-	<h3>Voto non ancora definito.</h3>
-</div>
-
-<div th:if="${esame.state == 'pubblicato' or esame.state == 'rifiutato' or esame.state == 'verbalizzato'}">
-<h3>Voto: <span th:text="${esame.mark}">7 ;(</span></h3>
-<h3>Stato: <span th:text="${esame.state}">Pubblicato</span></h3>
-<hr>
-
-<div th:if="${esame.state == 'pubblicato' and esame.mark != 'assente' and esame.mark != 'rimandato' and esame.mark != 'riprovato'}">
-<a th:href="@{/Reject(selectedCourseID=${selectedCourseID}, selectedExam=${selectedExam})}">
-  <button type="submit">Rifiuta Voto</button>
-</a>
-</div>
-
-</div>
-
-<div align="left">
-		<a th:href="@{/GoToHomeStudent}">Torna a selezione appello</a>
- </div>
+  <header>
+    <h1>MegaloPoli - Gestione esame studente</h1>
+  </header>
+  
+  <main>
+    <div class="page-header">
+      <h2 class="page-title">Informazioni sull'appello richiesto</h2>
+    </div>
+    
+    <div class="student-info verbal-info">
+      <div class="info-row">
+        <div class="info-label">Corso:</div>
+        <div class="info-value" th:text="${nome_corso}">Basi di Dati</div>
+      </div>
+      <div class="info-row">
+        <div class="info-label">Data appello:</div>
+        <div class="info-value" th:text="${esame.date}">2024-06-15</div>
+      </div>
+    
+	    <div th:if="${esame.state == 'non inserito' or esame.state == 'inserito'}" class="empty-state">
+	      <h3>Voto non ancora definito.</h3>
+	      <p>Il docente non ha ancora inserito o pubblicato il voto per questo appello.</p>
+	    </div>
+	    
+	    <div th:if="${esame.state == 'pubblicato' or esame.state == 'rifiutato' or esame.state == 'verbalizzato'}" class="info-section">
+	      <div class="info-row">
+	        <div class="info-label">Voto:</div>
+	        <div class="info-value grade-value" th:text="${esame.mark}">28</div>
+	      </div>
+	      <div class="info-row">
+	        <div class="info-label">Stato:</div>
+	        <div class="info-value status-value" th:text="${esame.state}">Pubblicato</div>
+	      </div>
+	      
+	      <div th:if="${esame.state == 'pubblicato' and esame.mark != 'assente' and esame.mark != 'rimandato' and esame.mark != 'riprovato'}" class="info-row">
+	        <a th:href="@{/Reject(selectedCourseID=${selectedCourseID}, selectedExam=${selectedExam})}" class="btn btn-danger">
+	          Rifiuta Voto
+	        </a>
+	      </div>
+	    </div>
+	</div>
+    
+    <div class="home-link">
+      <a th:href="@{/GoToHomeStudent}" class="btn btn-secondary">Torna a selezione appello</a>
+    </div>
+  </main>
 </body>
 </html>

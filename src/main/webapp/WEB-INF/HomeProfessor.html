@@ -1,64 +1,71 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html lang="it" xmlns:th="http://www.thymeleaf.org">
 <head>
-<meta charset="ISO-8859-1">
-<title>Admin's home</title>
+    <meta charset="ISO-8859-1">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home Professore</title>
+    <link rel="stylesheet" type="text/css" media="all" href="./css/base.css" th:href="@{/css/base.css}"/>
+    <link rel="stylesheet" type="text/css" media="all" href="./css/layout.css" th:href="@{/css/layout.css}" />
+    <link rel="stylesheet" type="text/css" media="all" href="./css/form.css" th:href="@{/css/form.css}" />
+    <link rel="stylesheet" type="text/css" media="all" href="./css/table.css" th:href="@{/css/table.css}" />
+    <link rel="stylesheet" type="text/css" media="all" href="./css/button.css" th:href="@{/css/button.css}" />
 </head>
 <body>
-	<div align="right">
-		<a th:href="@{/Logout}">Logout</a>
-	</div>
-	<h1>Bentornato nella home page</h1>
-	<span th:text="${session.user.name}">Simone</span>
-	<span th:text="${session.user.surname}">Ranfoni</span>
-	
-	 <div th:if="${#lists.isEmpty(availableCourses)}">
-    <p>Nessun corso disponibile!</p>
-  </div>
+    <header>
+        <div class="nav-right">
+            <form th:action="@{/Logout}" method="post">
+                <button type="submit" class="btn btn-logout">Logout</button>
+            </form>
+        </div>
+        <h1>MegaloPoli - Home Page Professore</h1>
+        <h3>Bentornato, professor <span th:text="${session.user.name}">Nome</span> <span th:text="${session.user.surname}">Cognome</span></h3>
+    </header>
+    <main>
+        <section class="form-container">
+            <div th:if="${#lists.isEmpty(availableCourses)}">
+                <p class="info-message">Nessun corso disponibile!</p>
+            </div>
+            <div th:if="${not #lists.isEmpty(availableCourses)}">
+                <form th:action="@{/GoToHomeProfessor}" method="post">
+                    <label for="scelta">Seleziona corso:</label>
+                    <select name="scelta" id="scelta" required>
+                        <option value="" th:if="${selectedCourseID == null}" disabled selected>Seleziona un corso</option>
+                        <option th:each="course : ${availableCourses}"
+                                th:value="${course.id}"
+                                th:text="${course.courseName}"
+                                th:selected="${course.id == selectedCourseID}">
+                        </option>
+                    </select>
+                    <button type="submit" class="btn btn-primary">Mostra date d'appello</button>
+                </form>
+            </div>
+        </section>
 
-  <div th:if="${not #lists.isEmpty(availableCourses)}">
-    <form th:action="@{/GoToHomeProfessor}" method="POST">
-      <label for="scelta">Seleziona corso:</label>
-      <select name="scelta" id="scelta" required>
-        <option value=""
-              th:if="${selectedCourseID == null}"
-              disabled
-              selected>
-        	    Seleziona un corso
-        </option>
-        <option th:each="course : ${availableCourses}"
-                th:value="${course.id}"
-                th:text="${course.courseName}"
-                th:selected="${course.id == selectedCourseID}">
-        </option>
-      </select>
-      <button type="submit">Mostra le date d'appello</button>
-    </form>
-  </div>
-  
-  <div th:if="${availableDates != null}">
-  	<div th:if="${#lists.isEmpty(availableDates)}">
-    	<p>Nessun appello disponibile!</p>
-  	</div>
-  	<div th:if="${not #lists.isEmpty(availableDates)}">
-  		<form th:action="@{/GoToStudentTable}" method="GET">
-  			<input type="hidden" name="selectedCourseID"
-         		   th:value="${selectedCourseID}" />
-		    <label for="date">Seleziona data d'appello:</label>
-		    <select name="date" id="date">
-		      <option th:each="app : ${availableDates}"
-		      	      th:value="${app.date}"
-		              th:text="${#temporals.format(app.date, 'dd/MM/yyyy')}">
-		      </option>
-		    </select>
-		    <button type="submit">Vedi informazioni appello</button>
-		</form>
-	</div>
-  </div>
-  
-  <div align="left">
-		<a th:href="@{/GetVerbals}">Visualizza i tuoi verbali</a>
-	</div>
-  
+        <section class="form-container" th:if="${availableDates != null}">
+            <div th:if="${#lists.isEmpty(availableDates)}">
+                <p class="info-message">Nessun appello disponibile!</p>
+            </div>
+            <div th:if="${not #lists.isEmpty(availableDates)}">
+                <form th:action="@{/GoToStudentTable}" method="get">
+                    <input type="hidden" name="selectedCourseID" th:value="${selectedCourseID}" />
+                    <label for="date">Seleziona data d'appello:</label>
+                    <select name="date" id="date" required>
+                        <option th:each="app : ${availableDates}"
+                                th:value="${app.date}"
+                                th:text="${#temporals.format(app.date, 'dd/MM/yyyy')}">
+                        </option>
+                    </select>
+                    <button type="submit" class="btn btn-primary">Vedi informazioni appello</button>
+                </form>
+            </div>
+        </section>
+    </main>
+    <footer>
+        <div class="nav-left">
+            <form th:action="@{/GetVerbals}" method="get">
+                <button type="submit" class="btn">Visualizza i tuoi verbali</button>
+            </form>
+        </div>
+    </footer>
 </body>
 </html>
