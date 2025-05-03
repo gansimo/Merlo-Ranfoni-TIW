@@ -12,18 +12,18 @@
 </head>
 <body>
     <header>
-        <div class="nav-right">
+        <h1>MegaloPoli - Home Page Professore</h1>
+        <h3>Bentornato, professor <span th:text="${session.user.name}">Nome</span> <span th:text="${session.user.surname}">Cognome</span></h3>
+        <div>
             <form th:action="@{/Logout}" method="post">
                 <button type="submit" class="btn btn-logout">Logout</button>
             </form>
         </div>
-        <h1>MegaloPoli - Home Page Professore</h1>
-        <h3>Bentornato, professor <span th:text="${session.user.name}">Nome</span> <span th:text="${session.user.surname}">Cognome</span></h3>
     </header>
     <main>
         <section class="form-container">
             <div th:if="${#lists.isEmpty(availableCourses)}">
-                <p class="info-message">Nessun corso disponibile!</p>
+                <p>Nessun corso disponibile!</p>
             </div>
             <div th:if="${not #lists.isEmpty(availableCourses)}">
                 <form th:action="@{/GoToHomeProfessor}" method="post">
@@ -43,7 +43,7 @@
 
         <section class="form-container" th:if="${availableDates != null}">
             <div th:if="${#lists.isEmpty(availableDates)}">
-                <p class="info-message">Nessun appello disponibile!</p>
+                <p>Nessun appello disponibile!</p>
             </div>
             <div th:if="${not #lists.isEmpty(availableDates)}">
                 <form th:action="@{/GoToStudentTable}" method="get">
@@ -59,13 +59,12 @@
                 </form>
             </div>
         </section>
+        <form th:action="@{/GetVerbals}" method="get" class="center">
+            <button type="submit" class="btn center">Visualizza i tuoi verbali</button>
+        </form>
     </main>
     <footer>
-        <div class="nav-left">
-            <form th:action="@{/GetVerbals}" method="get">
-                <button type="submit" class="btn">Visualizza i tuoi verbali</button>
-            </form>
-        </div>
+      	<p>&copy; 2025 Università Megalopoli, Milano</p>
     </footer>
 </body>
 </html>

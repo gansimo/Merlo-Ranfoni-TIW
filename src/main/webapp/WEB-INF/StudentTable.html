@@ -16,9 +16,9 @@
   </header>
   
   <main>
-    <div class="page-header">
-      <h2 th:if="${not #lists.isEmpty(studentTable)}" class="page-title">Elenco Studenti Iscritti all'appello del <span th:text="${date}">2024-06-15</span> del corso <span th:text="${courseName}">Basi di Dati</span></h2>
-      <h2 th:if="${#lists.isEmpty(studentTable)}" class="page-title">Non ci sono studenti iscritti all'appello richiesto!</h2>
+    <div>
+      <h2 th:if="${not #lists.isEmpty(studentTable)}">Elenco Studenti Iscritti all'appello del <span th:text="${date}">2024-06-15</span> del corso <span th:text="${courseName}">Basi di Dati</span></h2>
+      <h2 th:if="${#lists.isEmpty(studentTable)}">Non ci sono studenti iscritti all'appello richiesto!</h2>
     </div>
     
     <div th:if="${not #lists.isEmpty(studentTable)}" class="table-container">
@@ -94,7 +94,7 @@
             <td th:text="${student.mail}">studente1@uni.it</td>
             <td th:text="${student.course}">Informatica</td>
             <td th:text="${student.grade}">rimandato</td>
-            <td th:text="${student.state}">verbalizzato</td>
+            <td th:text="${student.state}" th:class="'state-' + ${student.state.replaceAll(' ', '-')}">verbalizzato</td>
             <td>
               <a th:if="${student.state == 'inserito' or student.state == 'non inserito'}"
                 th:href="@{/EditGrade(selectedStudID=${student.id}, selectedCourseID=${courseID}, date=${date})}">
@@ -126,7 +126,7 @@
       </table>
     </div>
     
-    <div class="action-links">
+    <div>
         <a th:href="@{/PublishGrades(selectedCourseID=${courseID}, date=${date})}" class="btn btn-primary">Pubblica i voti inseriti</a>
         <a th:href="@{/VerbalizeGrades(selectedCourseID=${courseID}, date=${date})}" class="btn btn-secondary">Verbalizza i voti pubblicati</a>
     </div>
@@ -135,5 +135,8 @@
       <a th:href="@{/GoToHomeProfessor}" class="btn">Torna alla Home</a>
     </div>
   </main>
+  <footer>
+      <p>&copy; 2025 Università MegaloPoli, Milano</p>
+  </footer>
 </body>
 </html>

@@ -17,11 +17,11 @@
   </header>
   
   <main>
-    <div class="page-header">
-      <h2 class="page-title">Informazioni sull'appello richiesto</h2>
+    <div>
+      <h2>Informazioni sull'appello richiesto</h2>
     </div>
     
-    <div class="student-info verbal-info">
+    <div class="verbal-info">
       <div class="info-row">
         <div class="info-label">Corso:</div>
         <div class="info-value" th:text="${nome_corso}">Basi di Dati</div>
@@ -31,12 +31,12 @@
         <div class="info-value" th:text="${esame.date}">2024-06-15</div>
       </div>
     
-	    <div th:if="${esame.state == 'non inserito' or esame.state == 'inserito'}" class="empty-state">
+	    <div th:if="${esame.state == 'non inserito' or esame.state == 'inserito'}">
 	      <h3>Voto non ancora definito.</h3>
 	      <p>Il docente non ha ancora inserito o pubblicato il voto per questo appello.</p>
 	    </div>
 	    
-	    <div th:if="${esame.state == 'pubblicato' or esame.state == 'rifiutato' or esame.state == 'verbalizzato'}" class="info-section">
+	    <div th:if="${esame.state == 'pubblicato' or esame.state == 'rifiutato' or esame.state == 'verbalizzato'}">
 	      <div class="info-row">
 	        <div class="info-label">Voto:</div>
 	        <div class="info-value grade-value" th:text="${esame.mark}">28</div>
@@ -58,5 +58,8 @@
       <a th:href="@{/GoToHomeStudent}" class="btn btn-secondary">Torna a selezione appello</a>
     </div>
   </main>
+  <footer>
+      <p>&copy; 2025 Università MegaloPoli, Milano</p>
+  </footer>
 </body>
 </html>

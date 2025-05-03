@@ -13,7 +13,7 @@
 </head>
 <body>
   <header>
-        <div class="nav-right">
+        <div>
             <form th:action="@{/Logout}" method="post">
                 <button type="submit" class="btn btn-logout">Logout</button>
             </form>
@@ -26,7 +26,7 @@
   <main>
     <section class="form-container">
             <div th:if="${#lists.isEmpty(corsi)}">
-                <p class="info-message">Nessun corso disponibile!</p>
+                <p>Nessun corso disponibile!</p>
             </div>
             <div th:if="${not #lists.isEmpty(corsi)}">
                 <form th:action="@{/GoToHomeStudent}" method="post">
@@ -48,7 +48,7 @@
      
      <section class="form-container" th:if="${appelli != null}">
             <div th:if="${#lists.isEmpty(appelli)}">
-                <p class="info-message">Nessun appello disponibile!</p>
+                <p>Nessun appello disponibile!</p>
             </div>
             <div th:if="${not #lists.isEmpty(appelli)}">
                 <form th:action="@{/SearchRound}" method="get">
@@ -65,5 +65,8 @@
             </div>
     </section>
   </main>
+  <footer>
+      <p>&copy; 2025 Università MegaloPoli, Milano</p>
+  </footer>
 </body>
 </html>

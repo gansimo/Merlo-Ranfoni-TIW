@@ -49,28 +49,12 @@
 /* Pulsante logout con colore differente */
 .btn-logout {
   background: var(--secondary-color);
+  float: right;
+  margin-right: 1rem; 
 }
 
 .btn-logout:hover {
   background: #6a7a7d;
-}
-
-/* Pulsante di successo */
-.btn-success {
-  background: #27ae60;
-}
-
-.btn-success:hover {
-  background: #219955;
-}
-
-/* Pulsante di avviso */
-.btn-warning {
-  background: #f39c12;
-}
-
-.btn-warning:hover {
-  background: #d68910;
 }
 
 /* Pulsante di pericolo */
@@ -82,41 +66,8 @@
   background: #c0392b;
 }
 
-/* Pulsante outline */
-.btn-outline {
-  background: transparent;
-  border: 2px solid var(--primary-color);
-  color: var(--primary-color);
-}
 
-.btn-outline:hover {
-  background: var(--primary-color);
-  color: white;
-}
-
-/* Dimensioni pulsanti */
 .btn-sm {
   padding: 0.4rem 0.8rem;
   font-size: 0.85rem;
-}
-
-.btn-lg {
-  padding: 0.9rem 1.8rem;
-  font-size: 1.1rem;
-}
-
-/* Pulsante a larghezza piena */
-.btn-block {
-  display: block;
-  width: 100%;
-  margin-bottom: 0.5rem;
-}
-
-/* Pulsante disabilitato */
-.btn:disabled,
-.btn.disabled {
-  opacity: 0.65;
-  cursor: not-allowed;
-  transform: none;
-  box-shadow: none;
 }

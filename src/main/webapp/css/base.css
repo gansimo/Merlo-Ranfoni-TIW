@@ -57,3 +57,9 @@ p {
 .spacing {
 	padding-top: 6px;
 }
+
+.center {
+	display: flex;
+  	justify-content: center;
+  	text-align: center;
+}

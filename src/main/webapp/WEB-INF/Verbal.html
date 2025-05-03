@@ -17,10 +17,10 @@
   </header>
   
   <main>
-    <div class="page-header">
+    <div>
       <div>
-        <h2 th:if="${isNew == 'true'}" class="page-title success-title">Nuovo verbale creato con successo</h2>
-        <h2 th:if="${isNew == 'false'}" class="page-title">Dati del verbale richiesto:</h2>
+        <h2 th:if="${isNew == 'true'}" class="success-title">Nuovo verbale creato con successo</h2>
+        <h2 th:if="${isNew == 'false'}">Dati del verbale richiesto:</h2>
       </div>
     </div>
     
@@ -90,5 +90,8 @@
       <a th:href="@{/GoToHomeProfessor}" class="btn">Torna alla Home</a>
     </div>
   </main>
+  <footer>
+      <p>&copy; 2025 Università MegaloPoli, Milano</p>
+  </footer>
 </body>
 </html>

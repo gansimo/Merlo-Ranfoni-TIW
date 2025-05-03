@@ -17,17 +17,17 @@
   </header>
   
   <main>
-    <div class="page-header">
-      <h2 class="page-title">Conferma Rifiuto</h2>
+    <div>
+      <h2>Conferma Rifiuto</h2>
     </div>
     
     <div class="verbal-info">
-      <div class="confirmation-message">
+      <div>
         <h3>Vuoi davvero rifiutare il voto?</h3>
         <p>Questa azione non può essere annullata dopo la conferma.</p>
       </div>
       
-      <div class="confirmation-actions">
+      <div>
         <a th:href="@{/SearchRound(selectedCourseID=${selectedCourseID}, selectedExam=${selectedExam})}" class="btn btn-secondary">
           Torna indietro
         </a>
@@ -42,5 +42,8 @@
       </div>
     </div>
   </main>
+  <footer>
+      <p>&copy; 2025 Università MegaloPoli, Milano</p>
+  </footer>
 </body>
 </html>
