@@ -9,6 +9,10 @@
   background-color: #27ae60;
 }
 
+.failure-title {
+	color: #e83617;
+}
+
 /* Verbal information styling */
 .verbal-info {
   background-color: #f8f9fa;

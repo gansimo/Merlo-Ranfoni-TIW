@@ -130,6 +130,8 @@ public class GoToStudentTable extends HttpServlet {
         ctx.setVariable("courseID", selectedCourseID);
         ctx.setVariable("date", stringDate);
         ctx.setVariable("courseName", courseName);
+        ctx.setVariable("publish", request.getParameter("pub"));   
+        ctx.setVariable("verbalize", request.getParameter("verb"));   
 
 		templateEngine.process(path, ctx, response.getWriter());
 	}

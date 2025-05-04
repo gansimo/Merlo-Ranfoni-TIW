@@ -94,16 +94,19 @@ public class PublishGrades extends HttpServlet {
 		
 		int selectedCourseID =  Integer.parseInt(request.getParameter("selectedCourseID"));
 		String selectedDate = request.getParameter("date");
+		int updated = 0;
 		
 		try {
-			stDAO.publishGrades(selectedCourseID, selectedDate, u.getId());
+			updated = stDAO.publishGrades(selectedCourseID, selectedDate, u.getId());
 			System.out.println("ciao");
 		} catch (SQLException e) {
 			//throw new ServletException(e);
 			response.sendError(HttpServletResponse.SC_BAD_GATEWAY, "Failure in database publishing grades");
  		}
 		
-		response.sendRedirect(request.getContextPath() + "/GoToStudentTable?selectedCourseID=" + selectedCourseID + "&date=" + URLEncoder.encode(selectedDate, "UTF-8"));
+		String result = (updated == 0) ? "false" : "true";
+		
+		response.sendRedirect(request.getContextPath() + "/GoToStudentTable?selectedCourseID=" + selectedCourseID + "&date=" + URLEncoder.encode(selectedDate, "UTF-8") + "&pub=" + result);
 	}
 
 	/**

@@ -147,7 +147,8 @@ public class StudentTableDAO {
 		}
 	}
 	
-	public void publishGrades(int courseID, String date, int profID) throws SQLException {
+	public int publishGrades(int courseID, String date, int profID) throws SQLException {
+		int updated;
 		String query = "UPDATE Iscrizioni_Appello SET stato = ? \n"
 				+ "WHERE id_corso = ? AND data = ? AND stato = 'inserito' AND \n"
 				+ "EXISTS( \n"
@@ -160,8 +161,9 @@ public class StudentTableDAO {
 			pstatement.setInt(2, courseID);
 			pstatement.setString(3, date);
 			pstatement.setInt(4, profID);
-			pstatement.executeUpdate();
+			updated = pstatement.executeUpdate();
 		}
+		return updated;
 	}
 	
 	public int verbalizeGrades(int courseID, String date, int profID) throws SQLException {
