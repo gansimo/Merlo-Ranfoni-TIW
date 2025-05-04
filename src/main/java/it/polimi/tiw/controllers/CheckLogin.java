@@ -62,7 +62,7 @@ public class CheckLogin extends HttpServlet {
  		}
 		String path = getServletContext().getContextPath();
 		if (u == null) {
-			path = getServletContext().getContextPath() + "/index.html";
+			path = path + "/index.html";
 		} else {
 			request.getSession().setAttribute("user", u);
 			String target = (u.getCourse().equals("Docente")) ? "/GoToHomeProfessor" : "/GoToHomeStudent";

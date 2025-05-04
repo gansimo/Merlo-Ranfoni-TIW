@@ -14,6 +14,9 @@ import java.net.URLEncoder;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -94,13 +97,18 @@ public class VerbalizeGrades extends HttpServlet {
 			return;
 		}
 		
-		StudentTableDAO stDAO = new StudentTableDAO(connection);
-		//int selectedCourseID = (Integer) s.getAttribute("selectedCourseID");
-		//String selectedDate = (String) s.getAttribute("selectedDate");
+		int selectedCourseID;
 		
-		int selectedCourseID =  Integer.parseInt(request.getParameter("selectedCourseID"));
+		try {
+		selectedCourseID =  Integer.parseInt(request.getParameter("selectedCourseID"));
+		LocalDate date = LocalDate.parse(request.getParameter("date"), DateTimeFormatter.ISO_LOCAL_DATE);
+		}catch (DateTimeParseException | NumberFormatException e) {
+			response.sendError(HttpServletResponse.SC_BAD_GATEWAY, "SQL injection is forbidden!");
+			return;
+		}
+		
 		String selectedDate = request.getParameter("date");
-		
+		StudentTableDAO stDAO = new StudentTableDAO(connection);
 		int updatedStudents = 0;
 		
 		try {
@@ -122,6 +130,15 @@ public class VerbalizeGrades extends HttpServlet {
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// TODO Auto-generated method stub
 		doGet(request, response);
+	}
+	
+	public void destroy() {
+		try {
+			if (connection != null) {
+				connection.close();
+			}
+		} catch (SQLException sqle) {
+		}
 	}
 
 }

@@ -6,6 +6,8 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 
 import jakarta.servlet.ServletContext;
 import jakarta.servlet.ServletException;
@@ -83,7 +85,16 @@ public class Reject extends HttpServlet {
 			return;
 		}
 		
-		int selectedCourseID = Integer.parseInt(request.getParameter("selectedCourseID"));
+		int selectedCourseID;
+		
+		try {
+		selectedCourseID = Integer.parseInt(request.getParameter("selectedCourseID"));
+		LocalDate date = LocalDate.parse(request.getParameter("selectedExam"), DateTimeFormatter.ISO_LOCAL_DATE);
+		}catch (DateTimeParseException | NumberFormatException e) {
+			response.sendError(HttpServletResponse.SC_BAD_GATEWAY, "SQL injection is forbidden!");
+			return;
+		}
+		
 		String date = request.getParameter("selectedExam");
 		
 		
@@ -117,7 +128,16 @@ public class Reject extends HttpServlet {
 			return;
 		}
 		
-		int selectedCourseID = Integer.parseInt(request.getParameter("selectedCourseID"));
+		int selectedCourseID;
+		
+		try {
+		selectedCourseID = Integer.parseInt(request.getParameter("selectedCourseID"));
+		LocalDate date = LocalDate.parse(request.getParameter("selectedExam"), DateTimeFormatter.ISO_LOCAL_DATE);
+		}catch (DateTimeParseException | NumberFormatException e) {
+			response.sendError(HttpServletResponse.SC_BAD_GATEWAY, "SQL injection is forbidden!");
+			return;
+		}
+		
 		String date = request.getParameter("selectedExam");
 
 		ExamDAO eDAO = new ExamDAO(connection);

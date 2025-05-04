@@ -214,5 +214,14 @@ public class EditGrade extends HttpServlet {
 		
 		response.sendRedirect(request.getContextPath() + "/GoToStudentTable?selectedCourseID=" + selectedCourseID + "&date=" + URLEncoder.encode(selectedDate, "UTF-8"));
 	}
+	
+	public void destroy() {
+		try {
+			if (connection != null) {
+				connection.close();
+			}
+		} catch (SQLException sqle) {
+		}
+	}
 
 }

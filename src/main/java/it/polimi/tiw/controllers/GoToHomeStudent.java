@@ -4,6 +4,9 @@ import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -123,9 +126,14 @@ public class GoToHomeStudent extends HttpServlet {
 		}
 		System.out.println("Utente loggato ID = " + u.getId()); 
 		
+		int selectedCourseID;
 		
-		String selectedCourse = request.getParameter("SelectedCourse");
-		int selectedCourseID = Integer.parseInt(selectedCourse);
+		try {
+		selectedCourseID = Integer.parseInt(request.getParameter("SelectedCourse"));
+		}catch (NumberFormatException e) {
+			response.sendError(HttpServletResponse.SC_BAD_GATEWAY, "SQL injection is forbidden!");
+			return;
+		}
 		
 		
 		StudentDAO sDAO = new StudentDAO(connection);

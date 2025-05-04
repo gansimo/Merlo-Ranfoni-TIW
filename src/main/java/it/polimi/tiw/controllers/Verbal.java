@@ -14,6 +14,9 @@ import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -94,19 +97,19 @@ public class Verbal extends HttpServlet {
 			return;
 		}
 		
-		StudentTableDAO stDAO = new StudentTableDAO(connection);
+		int selectedCourseID;
 		
-		//if(s.getAttribute("selectedCourseID") == null || s.getAttribute("selectedDate") == null) {
-		//	response.sendError(HttpServletResponse.SC_BAD_GATEWAY, "You have not selected a course!");
-		//	return;
-		//}
+		try {
+		selectedCourseID =  Integer.parseInt(request.getParameter("selectedCourseID"));
+		LocalDate date = LocalDate.parse(request.getParameter("date"), DateTimeFormatter.ISO_LOCAL_DATE);
+		}catch (DateTimeParseException | NumberFormatException e) {
+			response.sendError(HttpServletResponse.SC_BAD_GATEWAY, "SQL injection is forbidden!");
+			return;
+		}
 		
-		//int selectedCourseID = (Integer) s.getAttribute("selectedCourseID");
-		//String selectedDate = (String) s.getAttribute("selectedDate");
-		List<RegisteredStudent> students = new ArrayList<>();
-		
-		int selectedCourseID =  Integer.parseInt(request.getParameter("selectedCourseID"));
 		String selectedDate = request.getParameter("date");
+		StudentTableDAO stDAO = new StudentTableDAO(connection);
+		List<RegisteredStudent> students = new ArrayList<>();
 		
 		try {
 			students = stDAO.getNewVerbalizedStudents(selectedCourseID, selectedDate, u.getId());
@@ -143,23 +146,7 @@ public class Verbal extends HttpServlet {
 			return;
  		}
 		
-		//s.removeAttribute("selectedDate");
-		//s.setAttribute("studentTable", students);
-		//s.setAttribute("verbal", newVerbal);
-		
 		response.sendRedirect(request.getContextPath() + "/GoToVerbalPage?verbalID=" + newVerbal.getID() + "&isNew=true");
-		
-		//RequestDispatcher rd = request.getRequestDispatcher("/GoToVerbalPage");
-		//rd.forward(request, response);
-		
-		
-		/*String path = "/WEB-INF/Verbal.html";
-		JakartaServletWebApplication webApplication = JakartaServletWebApplication.buildApplication(getServletContext());
-        WebContext ctx = new WebContext(webApplication.buildExchange(request, response), request.getLocale());
-        ctx.setVariable("studentTable", students);
-        ctx.setVariable("verbal", newVerbal);
-
-		templateEngine.process(path, ctx, response.getWriter());*/
 	}
 
 	/**
@@ -168,6 +155,15 @@ public class Verbal extends HttpServlet {
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// TODO Auto-generated method stub
 		doGet(request, response);
+	}
+	
+	public void destroy() {
+		try {
+			if (connection != null) {
+				connection.close();
+			}
+		} catch (SQLException sqle) {
+		}
 	}
 
 }

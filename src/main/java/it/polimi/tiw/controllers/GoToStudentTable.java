@@ -14,7 +14,10 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import org.thymeleaf.TemplateEngine;
@@ -97,13 +100,18 @@ public class GoToStudentTable extends HttpServlet {
 		
 		StudentTableDAO stDAO = new StudentTableDAO(connection);
 		List<RegisteredStudent> students = new ArrayList<>();
+		int selectedCourseID;
 		
+		try {
+		selectedCourseID =  Integer.parseInt(request.getParameter("selectedCourseID"));
+		LocalDate date = LocalDate.parse(request.getParameter("date"), DateTimeFormatter.ISO_LOCAL_DATE);
+		}catch (DateTimeParseException | NumberFormatException e) {
+			response.sendError(HttpServletResponse.SC_BAD_GATEWAY, "SQL injection is forbidden!");
+			return;
+		}
 		
-		int selectedCourseID =  Integer.parseInt(request.getParameter("selectedCourseID"));
 		String stringDate = request.getParameter("date");
-		//s.setAttribute("selectedDate", stringDate);
-		//s.setAttribute("lastOrderCol", null);
-        //s.setAttribute("lastOrderDir", null);
+
 
 		try {
 			students = stDAO.getStudentTable(selectedCourseID, stringDate, u.getId());
@@ -142,6 +150,15 @@ public class GoToStudentTable extends HttpServlet {
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// TODO Auto-generated method stub
 		doGet(request, response);
+	}
+	
+	public void destroy() {
+		try {
+			if (connection != null) {
+				connection.close();
+			}
+		} catch (SQLException sqle) {
+		}
 	}
 
 }

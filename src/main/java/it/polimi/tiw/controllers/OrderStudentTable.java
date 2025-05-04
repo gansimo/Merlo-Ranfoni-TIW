@@ -13,6 +13,9 @@ import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -92,18 +95,16 @@ public class OrderStudentTable extends HttpServlet {
 			return;
 		}
 		
-		StudentTableDAO stDAO = new StudentTableDAO(connection);
-		List<RegisteredStudent> students = new ArrayList<>();
+		int selectedCourseID;
 		
-		//if(s.getAttribute("selectedCourseID") == null) {
-		//	response.sendError(HttpServletResponse.SC_BAD_GATEWAY, "You have not selected a course!");
-		//	return;
-		//}
+		try {
+		selectedCourseID =  Integer.parseInt(request.getParameter("selectedCourseID"));
+		LocalDate date = LocalDate.parse(request.getParameter("date"), DateTimeFormatter.ISO_LOCAL_DATE);
+		}catch (DateTimeParseException | NumberFormatException e) {
+			response.sendError(HttpServletResponse.SC_BAD_GATEWAY, "SQL injection is forbidden!");
+			return;
+		}
 		
-		//int selectedCourseID = (Integer) s.getAttribute("selectedCourseID");
-		
-		//String selectedDate = (String) s.getAttribute("selectedDate");
-		int selectedCourseID =  Integer.parseInt(request.getParameter("selectedCourseID"));
 		String selectedDate = request.getParameter("date");
 		String orderByColumn = request.getParameter("column");
 		
@@ -111,6 +112,9 @@ public class OrderStudentTable extends HttpServlet {
 	    String lastDir = (String) s.getAttribute("lastOrderDir");
 	    
 	    String orderByDirection = ("ASC".equals(lastDir) && orderByColumn.equals(lastCol)) ? "DESC" : "ASC";
+	    
+	    StudentTableDAO stDAO = new StudentTableDAO(connection);
+		List<RegisteredStudent> students = new ArrayList<>();
 
 		try {
 			students = stDAO.getOrderedStudentTable(selectedCourseID, selectedDate, orderByColumn, orderByDirection, u.getId());
@@ -149,6 +153,15 @@ public class OrderStudentTable extends HttpServlet {
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// TODO Auto-generated method stub
 		doGet(request, response);
+	}
+	
+	public void destroy() {
+		try {
+			if (connection != null) {
+				connection.close();
+			}
+		} catch (SQLException sqle) {
+		}
 	}
 
 }
