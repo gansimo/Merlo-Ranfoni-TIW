@@ -126,7 +126,7 @@ public class StudentTableDAO {
 	
 	public void updateGrade(int courseID, String date, int studID, String grade, String state, int profID) throws SQLException {
 		String query = "UPDATE Iscrizioni_Appello SET voto = ?, stato = ? \n"
-				+ "WHERE id_studente = ? AND id_corso = ? AND data = ? AND \n"
+				+ "WHERE id_studente = ? AND id_corso = ? AND data = ? AND (stato = ? OR stato = ?) AND \n"
 				+ "EXISTS( \n"
 				+ "		   SELECT * \n"
 				+ "        FROM Corso as c \n"
@@ -139,7 +139,10 @@ public class StudentTableDAO {
 			pstatement.setInt(3, studID);
 			pstatement.setInt(4, courseID);
 			pstatement.setString(5, date);
-			pstatement.setInt(6, profID);
+			pstatement.setString(6, "inserito");
+			pstatement.setString(7, "non inserito");
+			pstatement.setInt(8, profID);
+
 			int updated = pstatement.executeUpdate();
 		    if (updated == 0) {
 		      throw new SQLException("Nessuna riga aggiornata");
