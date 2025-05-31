@@ -83,7 +83,6 @@ public class GoToHomeStudent extends HttpServlet {
 		
 		
 		
-		System.out.println("Utente loggato ID = " + u.getId()); 
 		StudentDAO sDAO = new StudentDAO(connection);
 		List<Course> courses = null;
 		
