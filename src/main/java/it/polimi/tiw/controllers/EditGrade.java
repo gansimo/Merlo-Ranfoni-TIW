@@ -14,6 +14,9 @@ import java.net.URLEncoder;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -108,12 +111,9 @@ public class EditGrade extends HttpServlet {
 		int selectedCourseID =  Integer.parseInt(request.getParameter("selectedCourseID"));
 		String selectedDate = request.getParameter("date");
 		
-		
-		System.out.println(selectedCourseID + " " + selectedStudentID + " " + selectedDate);
 
 		try {
 			stud = stDAO.getRegisteredStudent(selectedCourseID, selectedDate, selectedStudentID, u.getId());
-			System.out.println("ciao");
 		} catch (SQLException e) {
 			//throw new ServletException(e);
 			response.sendError(HttpServletResponse.SC_BAD_GATEWAY, "Failure in database finding student");
@@ -196,12 +196,14 @@ public class EditGrade extends HttpServlet {
 
 	    try {
 	        int value = Integer.parseInt(grade);
+	        LocalDate date = LocalDate.parse(request.getParameter("date"), DateTimeFormatter.ISO_LOCAL_DATE);
 	        if(value < 18 || value > 30) {
 	        	response.sendError(HttpServletResponse.SC_BAD_GATEWAY, "Error: invalid grade!");
 				return;
 	        }
-	    } catch (NumberFormatException e) {
-	        // check left to the query enumeration
+	    } catch (DateTimeParseException | NumberFormatException e) {
+	    	response.sendError(HttpServletResponse.SC_BAD_GATEWAY, "SQL injection is forbidden!");
+	    	return;
 	    }
 		
 		try {
