@@ -117,26 +117,43 @@ public class Verbal extends HttpServlet {
 		
 		VerbalDAO vDAO = new VerbalDAO(connection);
 		VerbalBean newVerbal = new VerbalBean();
-		
+		boolean transactionCompletedSuccessfully = false;
+
 		try {
+			connection.setAutoCommit(false);
 			newVerbal = vDAO.createVerbal(selectedCourseID, selectedDate);
-			System.out.println("ciao");
+			vDAO.insertNewVerbalizedStudents(students, newVerbal);
+			connection.commit();
+		    transactionCompletedSuccessfully = true;
 		} catch (SQLException e) {
-			//throw new ServletException(e);
+			e.printStackTrace();
+		    try {
+		        if (connection != null) {
+		            //rollback in caso di errore
+		            connection.rollback();
+		        }
+		    } catch (SQLException ex) {
+		        System.err.println("Errore durante il tentativo di rollback: " + ex.getMessage());
+		        ex.printStackTrace();
+		        //eventuale errore di rollback (grave, problemi di connessione)
+		    }
 			response.sendError(HttpServletResponse.SC_BAD_GATEWAY, "Failure in database creating a new verbal");
 			return;
+ 		} finally {
+ 		    try {
+ 		        if (connection != null) {
+ 		            //ripristino auto-commit allo stato di default
+ 		            connection.setAutoCommit(true);
+ 		        }
+ 		    } catch (SQLException ex) {
+ 		        System.err.println("Errore durante il ripristino dell'auto-commit: " + ex.getMessage());
+ 		        ex.printStackTrace();
+ 		    }
  		}
 		
-		try {
-			vDAO.insertNewVerbalizedStudents(students, newVerbal);
-			System.out.println("ciao");
-		} catch (SQLException e) {
-			//throw new ServletException(e);
-			response.sendError(HttpServletResponse.SC_BAD_GATEWAY, "Failure in database adding students to the new verbal");
-			return;
- 		}
-		
-		response.sendRedirect(request.getContextPath() + "/GoToVerbalPage?verbalID=" + newVerbal.getID() + "&isNew=true");
+		if(transactionCompletedSuccessfully) {
+			response.sendRedirect(request.getContextPath() + "/GoToVerbalPage?verbalID=" + newVerbal.getID() + "&isNew=true");
+		}
 	}
 
 	/**

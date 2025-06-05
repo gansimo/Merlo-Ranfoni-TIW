@@ -100,20 +100,57 @@ public class VerbalizeGrades extends HttpServlet {
 		String selectedDate = request.getParameter("date");
 		StudentTableDAO stDAO = new StudentTableDAO(connection);
 		int updatedStudents = 0;
+		VerbalDAO vDAO = new VerbalDAO(connection);
+		VerbalBean newVerbal = new VerbalBean();
+		boolean transactionCompletedSuccessfully = false;
+		
+		List<RegisteredStudent> students = new ArrayList<>();
 		
 		try {
+			connection.setAutoCommit(false);
 			updatedStudents = stDAO.verbalizeGrades(selectedCourseID, selectedDate, u.getId());
-			System.out.println("ciao");
+			if(updatedStudents > 0) {
+				students = stDAO.getNewVerbalizedStudents(selectedCourseID, selectedDate, u.getId());
+				newVerbal = vDAO.createVerbal(selectedCourseID, selectedDate);
+				vDAO.insertNewVerbalizedStudents(students, newVerbal);
+			}
+			connection.commit();
+		    transactionCompletedSuccessfully = true;
 		} catch (SQLException e) {
-			//throw new ServletException(e);
+			e.printStackTrace();
+		    try {
+		        if (connection != null) {
+		            //rollback in caso di errore
+		            connection.rollback();
+		        }
+		    } catch (SQLException ex) {
+		        System.err.println("Errore durante il tentativo di rollback: " + ex.getMessage());
+		        ex.printStackTrace();
+		        //eventuale errore di rollback (grave, problemi di connessione)
+		    }
 			response.sendError(HttpServletResponse.SC_BAD_GATEWAY, "Failure in database verbalizing grades");
+			return;
+ 		} finally {
+ 		    try {
+ 		        if (connection != null) {
+ 		            //ripristino auto-commit allo stato di default
+ 		            connection.setAutoCommit(true);
+ 		        }
+ 		    } catch (SQLException ex) {
+ 		        System.err.println("Errore durante il ripristino dell'auto-commit: " + ex.getMessage());
+ 		        ex.printStackTrace();
+ 		    }
  		}
-		if(updatedStudents == 0)
-			response.sendRedirect(request.getContextPath() + "/GoToStudentTable?selectedCourseID=" + selectedCourseID + "&date=" + URLEncoder.encode(selectedDate, "UTF-8") + "&verb=false");
-		else 
-			response.sendRedirect(request.getContextPath() + "/Verbal?selectedCourseID=" + selectedCourseID + "&date=" + URLEncoder.encode(selectedDate, "UTF-8"));
+		
+		if(transactionCompletedSuccessfully) {
+			if(updatedStudents == 0)
+				response.sendRedirect(request.getContextPath() + "/GoToStudentTable?selectedCourseID=" + selectedCourseID + "&date=" + URLEncoder.encode(selectedDate, "UTF-8") + "&verb=false");
+			else 
+				response.sendRedirect(request.getContextPath() + "/GoToVerbalPage?verbalID=" + newVerbal.getID() + "&isNew=true");	
+			}
 	}
-
+	
+	
 	/**
 	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
 	 */
