@@ -79,19 +79,10 @@ public class EditGrade extends HttpServlet {
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		String loginpath = getServletContext().getContextPath() + "/index.html";
+		
 		UserBean u = null;
 		HttpSession s = request.getSession();
-		if (s.isNew() || s.getAttribute("user") == null) {
-			response.sendRedirect(loginpath);
-			return;
-		} else {
-			u = (UserBean) s.getAttribute("user");
-			if (!u.getCourse().equals("Docente")) {
-				response.sendRedirect(loginpath);
-				return;
-			}
-		}
+		u = (UserBean) s.getAttribute("user");
 		
 		if(request.getParameter("selectedCourseID") == null || request.getParameter("date") == null) {
 			response.sendError(HttpServletResponse.SC_BAD_GATEWAY, "You have not selected a course or a date!");
@@ -157,19 +148,9 @@ public class EditGrade extends HttpServlet {
 	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		String loginpath = getServletContext().getContextPath() + "/index.html";
 		UserBean u = null;
 		HttpSession s = request.getSession();
-		if (s.isNew() || s.getAttribute("user") == null) {
-			response.sendRedirect(loginpath);
-			return;
-		} else {
-			u = (UserBean) s.getAttribute("user");
-			if (!u.getCourse().equals("Docente")) {
-				response.sendRedirect(loginpath);
-				return;
-			}
-		}
+		u = (UserBean) s.getAttribute("user");
 		
 		if(request.getParameter("selectedCourseID") == null || request.getParameter("date") == null) {
 			response.sendError(HttpServletResponse.SC_BAD_GATEWAY, "You have not selected a course or a date!");

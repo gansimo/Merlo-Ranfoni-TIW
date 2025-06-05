@@ -71,24 +71,11 @@ public class GoToHomeProfessor extends HttpServlet {
 		}
 	}
 	
-	protected void doGet(HttpServletRequest request, HttpServletResponse response)
-			throws ServletException, IOException {
-
-		String loginpath = getServletContext().getContextPath() + "/index.html";
+	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		UserBean u = null;
 		HttpSession s = request.getSession();
-		if (s.isNew() || s.getAttribute("user") == null) {
-			response.sendRedirect(loginpath);
-			return;
-		} else {
-			u = (UserBean) s.getAttribute("user");
-			if (!u.getCourse().equals("Docente")) {
-				response.sendRedirect(loginpath);
-				return;
-			}
-		}
-		
-		
+		u = (UserBean) s.getAttribute("user");
+	
 		ProfessorDAO pDAO = new ProfessorDAO(connection);
 		List<Course> courses = new ArrayList<>();
 		try {
@@ -111,21 +98,9 @@ public class GoToHomeProfessor extends HttpServlet {
 	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		// TODO Auto-generated method stub
-		String loginpath = getServletContext().getContextPath() + "/index.html";
 		UserBean u = null;
 		HttpSession s = request.getSession();
-		if (s.isNew() || s.getAttribute("user") == null) {
-			response.sendRedirect(loginpath);
-			return;
-		} else {
-			u = (UserBean) s.getAttribute("user");
-			if (!u.getCourse().equals("Docente")) {
-				response.sendRedirect(loginpath);
-				return;
-			}
-		}
-		
+		u = (UserBean) s.getAttribute("user");
 		int selectedCourseID;
 		
 		try {
