@@ -176,12 +176,14 @@ public class EditGrade extends HttpServlet {
 		String grade = request.getParameter("newGrade");
 
 	    try {
-	        int value = Integer.parseInt(grade);
-	        LocalDate date = LocalDate.parse(request.getParameter("date"), DateTimeFormatter.ISO_LOCAL_DATE);
-	        if(value < 18 || value > 30) {
-	        	response.sendError(HttpServletResponse.SC_BAD_GATEWAY, "Error: invalid grade!");
-				return;
-	        }
+	    	LocalDate date = LocalDate.parse(request.getParameter("date"), DateTimeFormatter.ISO_LOCAL_DATE);
+	    	if(!grade.equals("assente") && !grade.equals("rimandato") && !grade.equals("riprovato") && !grade.equals("30 e lode")) {
+		        int value = Integer.parseInt(grade);
+		        if(value < 18 || value > 30) {
+		        	response.sendError(HttpServletResponse.SC_BAD_GATEWAY, "Error: invalid grade!");
+					return;
+		        }
+	    	}
 	    } catch (DateTimeParseException | NumberFormatException e) {
 	    	response.sendError(HttpServletResponse.SC_BAD_GATEWAY, "SQL injection is forbidden!");
 	    	return;
