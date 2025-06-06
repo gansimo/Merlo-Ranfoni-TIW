@@ -58,8 +58,8 @@ DELIMITER ;
 -- TABELLA: Utente
 CREATE TABLE Utente (
     `id` INT NOT NULL AUTO_INCREMENT,
-    `mail` VARCHAR(45) NOT NULL,
-    `psw` VARCHAR(45) NOT NULL,
+    `mail` VARCHAR(45) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
+    `psw` VARCHAR(45) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
     `nome` VARCHAR(45) NOT NULL,
     `cognome` VARCHAR(45) NOT NULL,
     `matricola` VARCHAR(45) DEFAULT NULL,
@@ -128,149 +128,85 @@ CREATE TABLE Iscrizioni_Corsi (
 
 
 
+-- #################################################
+-- # POPOLAMENTO DATI DI TEST
+-- #################################################
 
+INSERT INTO Utente (mail, psw, nome, cognome, matricola, corso_laurea) VALUES
+  -- Docenti (ID AUTO_INCREMENT: 1, 2, 3)
+  ('docente1@uni.it', 'pswDocente1', 'Marco', 'Rossi', NULL, 'Docente'),         -- ID 1 (docente titolare di corsi)
+  ('docente2@uni.it', 'pswDocente2', 'Laura', 'Bianchi', NULL, 'Docente'),       -- ID 2 (docente titolare di altri corsi, per testare accessi incrociati)
+  ('docente3@uni.it', 'pswDocente3', 'Pietro', 'Ferri', NULL, 'Docente'),        -- ID 3 (Docente SENZA corsi - caso limite)
 
--- 👥 UTENTI: 1 docente + 2 studenti
-INSERT INTO Utente (mail, psw, nome, cognome, matricola, corso_laurea)
-VALUES 
-('docente1@uni.it', 'pswDocente', 'Luca', 'Merlo', NULL, 'Docente'),       -- ID 1
-('studente1@uni.it', 'pswStud1', 'Marco', 'Rossi', 'S123456', 'Informatica'), -- ID 2
-('studente2@uni.it', 'pswStud2', 'Laura', 'Bianchi', 'S654321', 'Fisica');    -- ID 3
+  -- Studenti (ID AUTO_INCREMENT: 4, 5, 6)
+  ('studente1@uni.it', 'pswStud1', 'Alice', 'Verdi', 'S1001', 'Ingegneria Informatica'), -- ID 4
+  ('studente2@uni.it', 'pswStud2', 'Luca', 'Neri', 'S1002', 'Matematica'),               -- ID 5
+  ('studente3@uni.it', 'pswStud3', 'Giulia', 'Russo', 'S1003', 'Fisica'),                -- ID 6 (Studente NON ISCRITTO a nessun corso/appello - caso limite e per test non autorizzati)
+  -- NUOVI STUDENTI per popolare più appelli e scenari (ID AUTO_INCREMENT: 7, 8)
+  ('studente4@uni.it', 'pswStud4', 'Matteo', 'Bruno', 'S1004', 'Ingegneria Gestionale'), -- ID 7
+  ('studente5@uni.it', 'pswStud5', 'Sofia', 'Gallo', 'S1005', 'Economia');              -- ID 8
 
--- 📚 CORSO assegnato al docente (id_prof = 1)
-INSERT INTO Corso (nome, anno, id_prof)
-VALUES ('Basi di Dati', 2024, 1); -- ID 1
-
--- 📅 APPELLO del corso
-INSERT INTO Appello (id_corso, data)
-VALUES (1, '2024-06-15');
-
--- 📝 ISCRIZIONI al corso per gli studenti
-INSERT INTO Iscrizioni_Corsi (id_corso, id_studente)
-VALUES 
-(1, 2),
-(1, 3);
-
--- 1) Inserisco Mario Rossi
-INSERT INTO Utente (mail, psw, nome, cognome, matricola, corso_laurea)
-VALUES 
-  ('mario.rossi@uni.it', 'pswStud3', 'Mario', 'Rossi', 'S789012', 'Informatica');
-
--- 2) Creo 4 nuovi corsi (id_prof = 1)
+-- 2) CORSI
 INSERT INTO Corso (nome, anno, id_prof) VALUES
-  ('Algoritmi',          2024, 1),  -- id = 2
-  ('Reti di Calcolatori',2024, 1),  -- id = 3
-  ('SO - Sistemi Operativi',2024,1),-- id = 4
-  ('Calcolo Numerico',    2024, 1);  -- id = 5
+  -- Corsi del docente1 (ID 1) (ID AUTO_INCREMENT: 1, 2)
+  ('Analisi Matematica', 2025, 1),   -- ID 1: corso con appelli, per docente1
+  ('Programmazione I',    2025, 1),   -- ID 2: corso con un appello (verrà aggiunto), per docente1
 
--- 3) Inserisco 4 appelli per ciascun corso
---    (id_verbale univoco, data_verbale 5 giorni dopo, ora alle 09:00)
+  -- Corsi del docente2 (ID 2) (ID AUTO_INCREMENT: 3, 4)
+  ('Fisica 1',            2025, 2),   -- ID 3: corso con un appello, per docente2
+  ('Chimica Organica',    2024, 2);   -- ID 4: corso SENZA appelli, per docente2 (caso limite)
+  -- docente3 (ID 3) non ha corsi (caso limite)
 
--- Corso 2: Algoritmi
+-- 3) APPELLI
 INSERT INTO Appello (id_corso, data) VALUES
-  (2, '2024-07-01'),
-  (2, '2024-09-10'),
-  (2, '2024-11-20'),
-  (2, '2025-01-15');
+  -- Appelli per Analisi Matematica (ID Corso 1)
+  (1, '2025-06-15'),
+  (1, '2025-07-10'),
 
--- Corso 3: Reti di Calcolatori
-INSERT INTO Appello (id_corso, data) VALUES
-  (3, '2024-07-05'),
-  (3, '2024-09-12'),
-  (3, '2024-11-22'),
-  (3, '2025-01-18');
+  -- Appelli per Fisica 1 (ID Corso 3)
+  (3, '2025-06-20'), -- Questo appello avrà studenti iscritti
+  (3, '2025-09-10'), -- Questo appello NON avrà studenti iscritti
 
--- Corso 4: Sistemi Operativi
-INSERT INTO Appello (id_corso, data) VALUES
-  (4, '2024-07-08'),
-  (4, '2024-09-15'),
-  (4, '2024-11-25'),
-  (4, '2025-01-20');
+  -- NUOVO APPELLO per Programmazione I (ID Corso 2)
+  (2, '2025-07-01'); -- Per avere un appello anche per Programmazione I
 
--- Corso 5: Calcolo Numerico
-INSERT INTO Appello (id_corso, data) VALUES
-  (5, '2024-07-10'),
-  (5, '2024-09-18'),
-  (5, '2024-11-28'),
-  (5, '2025-01-22');
-  
-  
-  
-  -- aggiunte per incrementare il db
-  
-  INSERT INTO Utente (mail, psw, nome, cognome, matricola, corso_laurea) VALUES
-  ('docente2@uni.it', 'pswDoc2', 'Giulia',    'Verdi',    NULL, 'Docente'),
-  ('docente3@uni.it', 'pswDoc3', 'Alessandro','Neri',     NULL, 'Docente'),
-  ('docente4@uni.it', 'pswDoc4', 'Federica',  'Gialli',   NULL, 'Docente'),
-  ('docente5@uni.it', 'pswDoc5', 'Davide',    'Azzurri',  NULL, 'Docente');
 
-DELIMITER $$
+-- 4) ISCRIZIONI AI CORSI
+INSERT INTO Iscrizioni_Corsi (id_corso, id_studente) VALUES
+  -- Alice Verdi (ID 4)
+  (1, 4), -- Iscritta a Analisi Matematica (docente1)
+  (2, 4), -- Iscritta a Programmazione I (docente1)
+  (3, 4), -- NUOVA: Alice (ID 4) iscritta a Fisica 1 (docente2). Per testare studente iscritta a corso ma non a un suo specifico appello.
 
-DROP PROCEDURE IF EXISTS populate_students_courses$$
-CREATE PROCEDURE populate_students_courses()
-BEGIN
-    DECLARE i       INT DEFAULT 1;
-    DECLARE sid     INT;
-    DECLARE email   VARCHAR(50);
-    DECLARE nome    VARCHAR(30);
-    DECLARE cognome VARCHAR(30);
-    DECLARE matricola VARCHAR(10);
-    DECLARE corso_laurea VARCHAR(20);
+  -- Luca Neri (ID 5)
+  (1, 5), -- Iscritto solo ad Analisi Matematica (docente1)
 
-    WHILE i <= 50 DO
-        -- compongo valori
-        SET email        = CONCAT('studente', LPAD(i,2,'0'), '@uni.it');
-        SET nome         = CONCAT('Stud', i);
-        SET cognome      = CONCAT('Test',  i);
-        SET matricola    = CONCAT('S', LPAD(100000 + i, 6, '0'));
-        SET corso_laurea = ELT(
-            ((i-1) MOD 5) + 1,
-            'Informatica','Fisica','Matematica','Chimica','Ingegneria'
-        );
+  -- Giulia Russo (ID 6) NON ha iscrizioni a corsi (caso limite e per test non autorizzati)
 
-        -- 1) inserisco lo studente
-        INSERT INTO Utente(mail, psw, nome, cognome, matricola, corso_laurea)
-        VALUES (
-            email,
-            CONCAT('psw', i),
-            nome,
-            cognome,
-            matricola,
-            corso_laurea
-        );
-        SET sid = LAST_INSERT_ID();
+  -- Matteo Bruno (ID 7) - NUOVO STUDENTE
+  (1, 7), -- Iscritto a Analisi Matematica (docente1)
+  (3, 7), -- Iscritto a Fisica 1 (docente2)
 
-        -- 2) lo iscrivo a uno dei 5 corsi (10 studenti ciascuno)
-        INSERT INTO Iscrizioni_Corsi(id_corso, id_studente)
-        VALUES ( FLOOR((i-1)/10) + 1, sid );
+  -- Sofia Gallo (ID 8) - NUOVO STUDENTE
+  (2, 8), -- Iscritta a Programmazione I (docente1)
+  (4, 8); -- Iscritta a Chimica Organica (docente2) - corso senza appelli (caso limite: studente iscritta a corso senza appelli)
 
-        SET i = i + 1;
-    END WHILE;
-END$$
+-- 5) ISCRIZIONI AGLI APPELLI
+INSERT INTO Iscrizioni_Appello (id_corso, data, id_studente, voto, stato) VALUES
+  -- Studenti iscritti ad Analisi Matematica (ID Corso 1), appello del 2025-06-15
+  (1, '2025-06-15', 4, '<vuoto>', 'non inserito'),  -- Alice Verdi (ID 4)
+  (1, '2025-06-15', 5, '<vuoto>', 'non inserito'),  -- Luca Neri (ID 5)
+  (1, '2025-06-15', 7, '<vuoto>', 'non inserito'), -- Matteo Bruno (ID 7) - NUOVA ISCRIZIONE per popolare l'appello
 
-DELIMITER ;
+  -- Alice Verdi (ID 4) iscritta al secondo appello di Analisi Matematica (ID Corso 1)
+  (1, '2025-07-10', 4, '<vuoto>', 'non inserito'), -- Per testare studente con più iscrizioni ad appelli dello stesso corso
 
-CALL populate_students_courses();
-DROP PROCEDURE populate_students_courses;
+  -- Matteo Bruno (ID 7) iscritto all'appello di Fisica 1 (ID Corso 3), appello del 2025-06-20
+  (3, '2025-06-20', 7, '<vuoto>', 'non inserito'), -- Questo popola l'appello di Fisica 1.
+                                          -- Alice (ID 4) è iscritta al corso Fisica 1 (ID 3) MA NON a questo appello, utile per test.
 
-INSERT INTO Iscrizioni_Appello (id_corso, data, id_studente)
-SELECT
-  ic.id_corso,
-  a.data,
-  ic.id_studente
-FROM Iscrizioni_Corsi ic
-JOIN Appello a
-  ON a.id_corso = ic.id_corso;
+  -- Sofia Gallo (ID 8) iscritta all'appello di Programmazione I (ID Corso 2), appello del 2025-07-01
+  (2, '2025-07-01', 8, '<vuoto>', 'non inserito'); -- Alice (ID 4) è iscritta al corso Programmazione I (ID 2) MA NON a questo appello.
 
-  
--- SELECT * FROM Utente;
--- SELECT * FROM Corso;
--- SELECT * FROM Appello;
--- SELECT * FROM Iscrizioni_Corsi;
--- SELECT * FROM Iscrizioni_Appello;
-
-USE DBProject_Merlo_Ranfoni;
-CREATE USER 'root'@'%' IDENTIFIED BY 'password';
-CREATE USER 'root'@'localhost' IDENTIFIED BY 'password';
-GRANT ALL PRIVILEGES ON miodb.* TO 'root'@'password';
-FLUSH PRIVILEGES;
+  -- L'appello di Chimica Organica (ID Corso 4) non esiste, quindi nessuno studente può esservi iscritto.
+  -- Giulia Russo (ID 6) non è iscritta a nessun appello.
