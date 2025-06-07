@@ -75,7 +75,6 @@ public class GoToHomeStudent extends HttpServlet {
 		
 		try {
 			courses = sDAO.findStudentCourses(u.getId());
-			System.out.println("CORSI TROVATI = " + courses.size());
 		} catch (SQLException e) {
 			//throw new ServletException(e);
 			response.sendError(HttpServletResponse.SC_BAD_GATEWAY, "Failure in database finding student courses");

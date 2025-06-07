@@ -86,8 +86,15 @@ public class GoToVerbalPage extends HttpServlet {
 		
 		VerbalDAO vDAO = new VerbalDAO(connection);
 		VerbalBean verb = new VerbalBean();
+		int verbID;
 		
-		int verbID = Integer.parseInt(request.getParameter("verbalID"));
+		try {
+			verbID = Integer.parseInt(request.getParameter("verbalID"));
+		} catch (NumberFormatException e) {
+			response.sendError(HttpServletResponse.SC_BAD_GATEWAY, "Error: bad verbal ID parameter!");
+			return;
+		}
+		
 		String isNew = request.getParameter("isNew");
 		
 		try {

@@ -84,8 +84,8 @@ public class PublishGrades extends HttpServlet {
 		int selectedCourseID;
 		
 		try {
-		selectedCourseID =  Integer.parseInt(request.getParameter("selectedCourseID"));
-		LocalDate date = LocalDate.parse(request.getParameter("date"), DateTimeFormatter.ISO_LOCAL_DATE);
+			selectedCourseID =  Integer.parseInt(request.getParameter("selectedCourseID"));
+			LocalDate date = LocalDate.parse(request.getParameter("date"), DateTimeFormatter.ISO_LOCAL_DATE);
 		}catch (DateTimeParseException | NumberFormatException e) {
 			response.sendError(HttpServletResponse.SC_BAD_GATEWAY, "SQL injection is forbidden!");
 			return;

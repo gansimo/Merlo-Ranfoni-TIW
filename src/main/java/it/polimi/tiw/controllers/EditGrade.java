@@ -94,15 +94,23 @@ public class EditGrade extends HttpServlet {
 			return;
 		}
 		
-		StudentTableDAO stDAO = new StudentTableDAO(connection);
-		RegisteredStudent stud = new RegisteredStudent();
+		int selectedStudentID;
+		int selectedCourseID;
 		
-		String studentID = request.getParameter("selectedStudID");
-		int selectedStudentID = Integer.parseInt(studentID);
-		int selectedCourseID =  Integer.parseInt(request.getParameter("selectedCourseID"));
+		try {
+			selectedCourseID = Integer.parseInt(request.getParameter("selectedCourseID"));
+			selectedStudentID = Integer.parseInt(request.getParameter("selectedStudID"));
+			LocalDate.parse(request.getParameter("date"), DateTimeFormatter.ISO_LOCAL_DATE).toString();
+		} catch(NumberFormatException | DateTimeParseException e) {
+			response.sendError(HttpServletResponse.SC_BAD_GATEWAY, "Error: wrong students or date parameters!");
+			return;
+		}
+		
 		String selectedDate = request.getParameter("date");
 		
-
+		StudentTableDAO stDAO = new StudentTableDAO(connection);
+		RegisteredStudent stud = new RegisteredStudent();
+	
 		try {
 			stud = stDAO.getRegisteredStudent(selectedCourseID, selectedDate, selectedStudentID, u.getId());
 		} catch (SQLException e) {
@@ -164,6 +172,14 @@ public class EditGrade extends HttpServlet {
 		
 		if(request.getParameter("newGrade") == null) {
 			response.sendError(HttpServletResponse.SC_BAD_GATEWAY, "You have not selected a new grade!");
+			return;
+		}
+		
+		try {
+			Integer.parseInt(request.getParameter("selectedCourseID"));
+			Integer.parseInt(request.getParameter("selectedStudentID"));
+		} catch (NumberFormatException e) {
+			response.sendError(HttpServletResponse.SC_BAD_GATEWAY, "Error: invalid course ID or student ID!");
 			return;
 		}
 		
