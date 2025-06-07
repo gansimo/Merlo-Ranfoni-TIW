@@ -83,7 +83,6 @@ public class GetVerbals extends HttpServlet {
 		
 		try {
 			verbs = vDAO.getVerbals(u.getId());
-			System.out.println("ciao");
 		} catch (SQLException e) {
 			//throw new ServletException(e);
 			response.sendError(HttpServletResponse.SC_BAD_GATEWAY, "Failure in database finding verbals table");

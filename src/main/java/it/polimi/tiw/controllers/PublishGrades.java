@@ -97,7 +97,6 @@ public class PublishGrades extends HttpServlet {
 		
 		try {
 			updated = stDAO.publishGrades(selectedCourseID, selectedDate, u.getId());
-			System.out.println("ciao");
 		} catch (SQLException e) {
 			//throw new ServletException(e);
 			response.sendError(HttpServletResponse.SC_BAD_GATEWAY, "Failure in database publishing grades");

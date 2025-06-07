@@ -80,8 +80,8 @@ public class OrderStudentTable extends HttpServlet {
 		HttpSession s = request.getSession();
 		u = (UserBean) s.getAttribute("user");
 		
-		if(request.getParameter("selectedCourseID") == null || request.getParameter("date") == null) {
-			response.sendError(HttpServletResponse.SC_BAD_GATEWAY, "You have not selected a course or a date!");
+		if(request.getParameter("selectedCourseID") == null || request.getParameter("date") == null || request.getParameter("column") == null) {
+			response.sendError(HttpServletResponse.SC_BAD_GATEWAY, "Error: You have not selected a course, a date or a column!");
 			return;
 		}
 		
@@ -108,7 +108,6 @@ public class OrderStudentTable extends HttpServlet {
 
 		try {
 			students = stDAO.getOrderedStudentTable(selectedCourseID, selectedDate, orderByColumn, orderByDirection, u.getId());
-			System.out.println("ciao");
 		} catch (SQLException e) {
 			//throw new ServletException(e);
 			response.sendError(HttpServletResponse.SC_BAD_GATEWAY, "Failure in database to order student table!");

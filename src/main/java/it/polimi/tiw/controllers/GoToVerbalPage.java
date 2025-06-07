@@ -99,7 +99,6 @@ public class GoToVerbalPage extends HttpServlet {
 		
 		try {
 			verb = vDAO.getVerbal(verbID, u.getId());
-			System.out.println("ciao");
 		} catch (SQLException e) {
 			//throw new ServletException(e);
 			response.sendError(HttpServletResponse.SC_BAD_GATEWAY, "Failure in database finding a verbal");
@@ -116,7 +115,6 @@ public class GoToVerbalPage extends HttpServlet {
 		
 		try {
 			studs = stDAO.getStudentsFromVerbal(verbID);		//i do not need to authorize the query because if this point is reached it means the previous check passed
-			System.out.println("ciao");
 		} catch (SQLException e) {
 			//throw new ServletException(e);
 			response.sendError(HttpServletResponse.SC_BAD_GATEWAY, "Failure in database finding student table");

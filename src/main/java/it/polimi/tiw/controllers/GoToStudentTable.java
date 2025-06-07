@@ -104,7 +104,6 @@ public class GoToStudentTable extends HttpServlet {
 
 		try {
 			students = stDAO.getStudentTable(selectedCourseID, stringDate, u.getId());
-			System.out.println("ciao");
 		} catch (SQLException e) {
 			//throw new ServletException(e);
 			response.sendError(HttpServletResponse.SC_BAD_GATEWAY, "Failure in database finding student table");

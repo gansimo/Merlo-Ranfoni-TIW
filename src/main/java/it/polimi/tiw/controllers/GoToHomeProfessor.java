@@ -80,7 +80,6 @@ public class GoToHomeProfessor extends HttpServlet {
 		List<Course> courses = new ArrayList<>();
 		try {
 			courses = pDAO.findProfessorCourses(u.getId());
-			System.out.println("ciao");
 		} catch (SQLException e) {
 			//throw new ServletException(e);
 			response.sendError(HttpServletResponse.SC_BAD_GATEWAY, "Failure in database finding professor courses");
@@ -115,7 +114,6 @@ public class GoToHomeProfessor extends HttpServlet {
 		
 		try {
 			exams = cDAO.findExams(selectedCourseID, u.getId());
-			System.out.println("ciao");
 		} catch (SQLException e) {
 			//throw new ServletException(e);
 			response.sendError(HttpServletResponse.SC_BAD_GATEWAY, "Failure in database finding professor courses");
@@ -126,7 +124,6 @@ public class GoToHomeProfessor extends HttpServlet {
 		List<Course> courses = new ArrayList<>();
 		try {
 			courses = pDAO.findProfessorCourses(u.getId());
-			System.out.println("ciao");
 		} catch (SQLException e) {
 			//throw new ServletException(e);
 			response.sendError(HttpServletResponse.SC_BAD_GATEWAY, "Failure in database finding professor courses");
